@@ -1,9 +1,30 @@
 using Npgsql;
 
+using TaskTrackPro.Core.Repositories.Commands.Implementations;
+using TaskTrackPro.Core.Repositories.Commands.Interfaces;
+
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+// ✅ Add CORS Policy
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllOrigins",
+        policy =>
+        {
+            policy.AllowAnyOrigin() // Allows requests from any frontend (Avoid in production)
+                  .AllowAnyMethod() // Allows GET, POST, PUT, DELETE, etc.
+                  .AllowAnyHeader(); // Allows all headers
+        });
+});
+
+// ✅ Configure PostgreSQL connection
+var connectionString = builder.Configuration.GetConnectionString("pgconnection");
+builder.Services.AddScoped<NpgsqlConnection>(_ => new NpgsqlConnection(connectionString));
+builder.Services.AddScoped<ITaskInterface, TaskRepository>();
+
+// ✅ Add services for Controllers & API
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
@@ -23,39 +44,23 @@ builder.Services.AddSingleton<NpgsqlConnection>((ServiceProvider) =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// ✅ Use CORS Middleware (Must be before `UseAuthorization`)
+app.UseCors("AllowAllOrigins");
+
+// ✅ Configure Swagger for API documentation
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
+
 app.UseCors("corsapp");
+
+// ✅ Middleware Pipeline Configuration
 app.UseHttpsRedirection();
+app.UseAuthorization();  // Handles authentication & authorization
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast")
-.WithOpenApi();
+app.MapControllers(); // ✅ This replaces `UseRouting()` and `UseEndpoints()`
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
