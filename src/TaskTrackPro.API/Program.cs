@@ -1,6 +1,8 @@
 using Npgsql;
+
 using TaskTrackPro.Core.Repositories.Commands.Implementations;
 using TaskTrackPro.Core.Repositories.Commands.Interfaces;
+
  
 
 var builder = WebApplication.CreateBuilder(args);
@@ -53,7 +55,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+
 app.UseCors("corsapp");
+
 app.UseHttpsRedirection();
 app.UseAuthorization();  // Handles authentication & authorization
 
