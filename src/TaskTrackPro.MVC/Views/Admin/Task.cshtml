@@ -1,0 +1,272 @@
+@{
+    Layout = "_Custom";
+}
+<!-- Menu Section-->
+<section class="main-section-menu bg-light bb-1">
+    <ul class="main-section-menu-ul" id="mainSectionMenu">
+        <li><a asp-action="Index" id="iAuditDashboard" class="ms-menu-link">Dashboard</a></li>
+        <li><a asp-action="Members" id="iAuditTemplate" class="ms-menu-link">Members</a></li>
+        <li><a href="javascript:void(0);" id="iAuditInspection" class="ms-menu-link active">Task</a></li>
+        <li><a asp-action="Reports" id="iAuditSchdules" class="ms-menu-link">Reports</a></li>
+        <li><a asp-action="Messages" id="iAuditAnalytics" class="ms-menu-link">Messages</a></li>
+    </ul>
+</section>
+<!--// Menu Section-->
+
+<!--// Main Section-->
+<div class="d-flex dashboard-wrapper justify-content-center align-items-center h100 mt-5 ">
+    <div class="dashboard-left   d-flex flex-column h100">
+        <div class="row-container h100">
+            <div class="col-width-100 ">
+                <div class="searchbar">
+                    <div class="clear-input search-box w100">
+                        <input type="text" name="txtTagListSearch" id="txtTagListSearch" aria-label="tag name"
+                            class="form-control k-textbox k-valid" placeholder="Search Task here...">
+                        <i class="icon-search" aria-hidden="true"></i>
+                        <a role="button" id="btnTagListSearch" aria-label="Clear Search" href="javascript:void(0);"
+                            class="btn-icn-hover close icon-cancel" data-ara-title="Clear Search"></a>
+                    </div>
+                    <div class="action-div d-flex">
+                        <a href="javascript:void(0);" class="btn btn-raised btn-primary btn-block mr-5" role="button"
+                            aria-haspopup="true" aria-expanded="false" id="actionbtnmenu1"><i aria-hidden="true"
+                                class="icon-search"></i><span>Search</span></a>
+                        <a href="javascript:void(0);" class="btn btn-raised btn-primary btn-add-task btn-block ml-5"
+                            role="button" aria-haspopup="true" aria-expanded="false" id="actionbtnmenu1"><i
+                                aria-hidden="true" class="icon-add"></i><span>Task</span></a>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-width-100 h100 ">
+                <div class="grid-wrapper">
+                    <div id="kendoGrid" class="k-grid-with-pager"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="task-window-table">
+    <div class="window-wrapper">
+        <div class="success-message msg-top">
+            <p>Task successfully added.</p>
+            <a class="close"><i class="icon-cancel"></i></a>
+        </div>
+        <form>
+            <div class="form-group">
+                <label>Task Title</label>
+                <input type="text" class="form-control" title="table name">
+            </div>
+            <div class="form-group mb-10">
+                <label for="autoComplete">Select Member</label>
+                <input id="autoComplete" class="form-control border b-1" title="date timepicker" />
+            </div>
+            <div class="form-group mb-10">
+                <label for="startdatetimepicker">Start Date Timepicker</label>
+                <input id="startdatetimepicker" class="form-control" title="date timepicker" />
+            </div>
+            <div class="form-group mb-10">
+                <label for="enddatetimepicker">End Date Timepicker</label>
+                <input id="enddatetimepicker" class="form-control" title="date timepicker" />
+            </div>
+            <div class="form-group">
+                <label>Description <span class="text-muted">(Optional)</span></label>
+                <textarea class="form-control" rows="4" placeholder="Write here" title="description"></textarea>
+            </div>
+        </form>
+    </div>
+    <div class="window-footer">
+        <a class="btn btn-trans close-window">Cancel</a><a class="btn btn-primary">Save</a>
+    </div>
+</div>
+
+@* Delete Task Model *@
+<div id="delete-window-table">
+    <div class="window-wrapper">
+        <div class="mb-10">
+            <h5>Task Name</h5>
+            <p>This is task name</p>
+        </div>
+        <div class="mb-10">
+            <h5>Member</h5>
+            <p>Henil</p>
+        </div>
+        <div class="mb-10">
+            <h5>Task Status</h5>
+            <p>Complete</p>
+        </div>
+        <div class="mb-10">
+            <h5>Task Duration</h5>
+            <p>25/01/2003 - 25/02/2023</p>
+        </div>
+        <div class="mb-10">
+            <h5>Task Description</h5>
+            <p>This is Task Description</p>
+        </div>
+    </div>
+    <div class="window-footer">
+        <a class="btn btn-trans close-window">Cancel</a><a class="btn btn-primary">Delete</a>
+    </div>
+</div>
+
+@* Edit Task Model *@
+<div id="edit-window-table">
+    <div class="window-wrapper">
+        <div class="success-message msg-top">
+            <p>Task successfully added.</p>
+            <a class="close"><i class="icon-cancel"></i></a>
+        </div>
+        <form>
+            <div class="form-group">
+                <label>Task Title</label>
+                <input type="text" class="form-control" title="table name">
+            </div>
+            <div class="form-group mb-10">
+                <label for="autoComplete">Select Member</label>
+                <input id="autoComplete" class="form-control border b-1" title="date timepicker" />
+            </div>
+            <div class="form-group mb-10">
+                <label for="startdatetimepicker">Start Date Timepicker</label>
+                <input id="startdatetimepicker" class="form-control" title="date timepicker" />
+            </div>
+            <div class="form-group mb-10">
+                <label for="enddatetimepicker">End Date Timepicker</label>
+                <input id="enddatetimepicker" class="form-control" title="date timepicker" />
+            </div>
+            <div class="form-group">
+                <label>Description <span class="text-muted">(Optional)</span></label>
+                <textarea class="form-control" rows="4" placeholder="Write here" title="description"></textarea>
+            </div>
+        </form>
+    </div>
+    <div class="window-footer">
+        <a class="btn btn-trans close-window">Cancel</a><a class="btn btn-primary">Save</a>
+    </div>
+</div>
+<script>
+
+    var fieldData = new kendo.data.DataSource({
+        data: [{ "srno": 21, "fieldid": "aef10a22-d358-11e7-aac1-f32302802ef2", "fieldname": "Data1", "tablegroupsid": "18e252ca-bd32-11e7-85a5-14b31f1d9301", "groupname": "email", "fieldtype": 1, "tableschemaid": "c085d36c-bd28-11e7-bb72-14b31f1d9301" },
+        { "srno": 22, "fieldid": "b70dbcaa-d358-11e7-aac3-bffdf82ae7ed", "fieldname": "Data2", "tablegroupsid": "18e252ca-bd32-11e7-85a5-14b31f1d9301", "groupname": "email", "fieldtype": 1, "tableschemaid": "c085d36c-bd28-11e7-bb72-14b31f1d9301" }, { "srno": 25, "fieldid": "bff9dc36-d358-11e7-aac5-377b4dcd535a", "fieldname": "Data3", "tablegroupsid": "18e252ca-bd32-11e7-85a5-14b31f1d9301", "groupname": "email", "fieldtype": 1, "tableschemaid": "c085d36c-bd28-11e7-bb72-14b31f1d9301" }, { "srno": 2, "fieldid": "0b8a047a-bd36-11e7-964c-14b31f1d9301", "fieldname": "emai lconversation topic", "tablegroupsid": "18e252ca-bd32-11e7-85a5-14b31f1d9301", "groupname": "email", "fieldtype": 6, "tableschemaid": "c085d36c-bd28-11e7-bb72-14b31f1d9301" }, { "srno": 18, "fieldid": "a7bd2cec-bd35-11e7-962a-14b31f1d9301", "fieldname": "email appnt conct", "tablegroupsid": "18e252ca-bd32-11e7-85a5-14b31f1d9301", "groupname": "email", "fieldtype": 6, "tableschemaid": "c085d36c-bd28-11e7-bb72-14b31f1d9301" }, { "srno": 17, "fieldid": "9a07a1c2-bd35-11e7-9626-14b31f1d9301", "fieldname": "email appnt durtn", "tablegroupsid": "18e252ca-bd32-11e7-85a5-14b31f1d9301", "groupname": "email", "fieldtype": 5, "tableschemaid": "c085d36c-bd28-11e7-bb72-14b31f1d9301" },
+        { "srno": 33, "fieldid": "db02ec2c-bd35-11e7-963b-14b31f1d9301", "fieldname": "email appnt end dt", "tablegroupsid": "18e252ca-bd32-11e7-85a5-14b31f1d9301", "groupname": "email", "fieldtype": 9, "tableschemaid": "c085d36c-bd28-11e7-bb72-14b31f1d9301" }, { "srno": 14, "fieldid": "48a7aa52-bd35-11e7-8600-14b31f1d9301", "fieldname": "email appnt str dt", "tablegroupsid": "18e252ca-bd32-11e7-85a5-14b31f1d9301", "groupname": "email", "fieldtype": 9, "tableschemaid": "c085d36c-bd28-11e7-bb72-14b31f1d9301" },
+        { "srno": 20, "fieldid": "adf46e32-bd34-11e7-85ce-14b31f1d9301", "fieldname": "email appntre source", "tablegroupsid": "18e252ca-bd32-11e7-85a5-14b31f1d9301", "groupname": "email", "fieldtype": 6, "tableschemaid": "c085d36c-bd28-11e7-bb72-14b31f1d9301" }, { "srno": 6, "fieldid": "18cea452-bd35-11e7-85ed-14b31f1d9301", "fieldname": "email att cnt", "tablegroupsid": "18e252ca-bd32-11e7-85a5-14b31f1d9301", "groupname": "email", "fieldtype": 2, "tableschemaid": "c085d36c-bd28-11e7-bb72-14b31f1d9301" }],
+        schema: { model: { id: "fieldid" } }
+    });
+    $("#kendoGrid").kendoGrid({
+        dataSource: fieldData,
+        pageSize: 2,
+        search: true,
+        scrollable: true,
+        resizable: false,
+        autoBind: true,
+
+    @* config: { CurrentPage: 0, TotalPage: 10, RecordPerPage: 10, TotalRecord: 100, searchText: "" }, *@
+        columns: [
+        { field: "fieldname", title: "field Name" },
+        { field: "groupname", title: "field Data Type" },
+        { field: "srno", title: "Size" },
+        {
+            template: "<div class='grid-action'><a href='javascript:void(0);' class='text-muted btn-edit-task slider-btn'><i class='icon-edit'></i></a><a href='javascript:void(0);' class='text-muted btn-delete-task slider-setting-btn'><i class='icon-delete'></i></a></div>",
+            field: "Action",
+            title: "Action",
+            width: 100
+        }]
+    }).data("kendoGrid");
+    $("#kendoPager").kendoPager({
+        dataSource: fieldData,
+        refresh: true
+    });
+    fieldData.read();
+
+</script>
+
+
+@* Show Add Task Model *@
+<script>
+
+    $("#task-window-table").kendoWindow({
+        width: 450,
+        title: "Add New Task",
+        visible: false,
+        draggable: false,
+        resizable: false,
+        actions: [
+            "Close"
+        ],
+        modal: true
+    }).data("kendoWindow");
+
+    $(document).on('click', '.btn-add-task', function () {
+        $("#task-window-table").data("kendoWindow").center().open();
+    });
+
+</script>
+
+@* Delete Task *@
+<script>
+
+    $("#delete-window-table").kendoWindow({
+        width: 450,
+        title: "Delete Task",
+        visible: false,
+        draggable: false,
+        resizable: false,
+        actions: [
+            "Close"
+        ],
+        modal: true
+    }).data("kendoWindow");
+
+    $(document).on('click', '.btn-delete-task', function () {
+        $("#delete-window-table").data("kendoWindow").center().open();
+    });
+
+</script>
+
+@* Edit Task *@
+<script>
+
+    $("#edit-window-table").kendoWindow({
+        width: 450,
+        title: "Edit Task",
+        visible: false,
+        draggable: false,
+        resizable: false,
+        actions: [
+            "Close"
+        ],
+        modal: true
+    }).data("kendoWindow");
+
+    $(document).on('click', '.btn-edit-task', function () {
+        $("#edit-window-table").data("kendoWindow").center().open();
+    });
+
+</script>
+
+@* Select Status *@
+<script>
+
+    $("#autoComplete").kendoAutoComplete({
+        minLength: 3,
+        dataTextField: "ContactName", // JSON property name to use
+        dataSource: new kendo.data.DataSource({
+            type: "odata", // specifies data protocol
+            transport: {
+                read: "https://demos.telerik.com/kendo-ui/service/Northwind.svc/Customers"
+            }
+        })
+    });
+
+    $("#multiSelectDropdown").kendoDropDownList();
+
+
+    $("#startdatetimepicker").kendoDateTimePicker({
+        value: new Date()
+    });
+    $("#enddatetimepicker").kendoDateTimePicker({
+        value: new Date()
+    });
+
+</script>
