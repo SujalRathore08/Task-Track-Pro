@@ -1,0 +1,127 @@
+@{
+    Layout = "_Custom";
+}
+<!-- Menu Section-->
+<section class="main-section-menu bg-light bb-1">
+    <ul class="main-section-menu-ul" id="mainSectionMenu">
+        <li><a asp-action="Index" id="iAuditDashboard" class="ms-menu-link">Dashboard</a></li>
+        <li><a asp-action="Members" id="iAuditTemplate" class="ms-menu-link">Members</a></li>
+        <li><a asp-action="Task" id="iAuditInspection" class="ms-menu-link">Task</a></li>
+        <li><a asp-action="Reports" id="iAuditSchdules" class="ms-menu-link">Reports</a></li>
+        <li><a href="javascript:void(0);" id="iAuditAnalytics" class="ms-menu-link active">Messages</a></li>
+    </ul>
+</section>
+<!--// Menu Section-->
+
+
+
+
+
+
+<!--// Main Section-->
+<div class="d-flex dashboard-wrapper justify-content-center align-items-center h100 mt-5 ">
+    <div class="dashboard-left  overflow-auto d-flex flex-column ">
+        <div class="row-container p-5  h100 d-flex ">
+            <div class="col-width-30 pr-5">
+                <button class="btn btn-primary w100 mb-3 d-flex align-items-center justify-content-center">
+                    <i class="icon-invite-user mr-2" aria-hidden="true"></i> Add New User
+                </button>
+                
+                <div class="clear-input mb-5 position-relative">
+                    <input type="text" class="form-control k-textbox" placeholder="Search User..." aria-label="Search Text">
+                    <a href="javascript:void(0);" role="button" aria-label="Clear text" class="icon-cancel close position-absolute"></a>
+                </div>
+                
+                <ul id="listView" class="k-listview user-listview border rounded p-5 bg-white" aria-label="User List">
+                    <button class="btn btn-default w100">hello</button>
+                </ul>
+            </div>
+            
+            <div class="col-width-70 pl-5">
+                <div class="chat-container border rounded bg-white shadow-sm">
+                    <div class="chat-area p-3 bg-light h-100 w-100" id="chatMessages">
+                        <p class="text-muted">Start a conversation...</p>
+                    </div>
+                    <div class="searchbar d-flex align-items-center p-5 border-top">
+                        <div class="clear-input search-box flex-grow-1 position-relative">
+                            <input type="text" name="txtTagListSearch" id="txtTagListSearch" aria-label="Type a message" 
+                                class="form-control k-textbox" placeholder="Send a message...">
+                            <a role="button" id="btnClearText" aria-label="Clear message" href="javascript:void(0);" 
+                                class="btn-icn-hover close icon-cancel position-absolute"></a>
+                        </div>
+                        <button class="btn btn-primary ml-2">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .user-listview {
+        height: 350px;
+        overflow-y: auto;
+        border: 1px solid #ddd;
+        background: #f8f9fa;
+    }
+
+    .chat-container {
+        display: flex;
+        flex-direction: column;
+        height: 500px;
+    }
+
+    .chat-area {
+        flex-grow: 1;
+        overflow-y: auto;
+    }
+
+    .searchbar {
+        display: flex;
+        align-items: center;
+    }
+
+    .clear-input input {
+        padding-right: 30px;
+    }
+
+    .clear-input .icon-cancel {
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%);
+    }
+</style>
+
+
+
+
+<script>
+
+    $("#tabstrip").kendoTabStrip({
+        animation: {
+            open: {
+                effects: "fadeIn"
+            }
+        }
+    });
+
+</script>
+<script>
+
+    $("#window-table").kendoWindow({
+        width: 450,
+        title: "Search User",
+        visible: false,
+        draggable: false,
+        resizable: false,
+        actions: [
+            "Close"
+        ],
+        modal: true
+    }).data("kendoWindow");
+
+    $(document).on('click', '.btn-new-table', function () {
+        $("#window-table").data("kendoWindow").center().open();
+    });
+
+</script>
