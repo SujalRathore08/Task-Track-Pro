@@ -1,9 +1,25 @@
+using Npgsql;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddControllers();
+
+// Configuring cors 
+builder.Services.AddCors(p => p.AddPolicy("corsapp", builder =>
+{
+    builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
+}));
+
+// Configuring connection string
+builder.Services.AddSingleton<NpgsqlConnection>((ServiceProvider) =>
+{
+    var connection = ServiceProvider.GetRequiredService<IConfiguration>().GetConnectionString("pgconnection");
+    return new NpgsqlConnection(connection);
+});
 
 var app = builder.Build();
 
@@ -14,6 +30,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors("corsapp");
 app.UseHttpsRedirection();
 
 var summaries = new[]
