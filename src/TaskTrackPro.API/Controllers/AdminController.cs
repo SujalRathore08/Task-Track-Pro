@@ -27,5 +27,12 @@ namespace TaskTrackPro.API.Controllers
             var users = await _adminQuery.GetAllUsers();
             return Ok(users);
         }
+
+        [HttpGet("user")]
+        public async Task<IActionResult> GetUserById(int userId)
+        {
+            var user = await _adminQuery.GetUserById(userId);
+            return Ok(user);
+        }
     }
 }

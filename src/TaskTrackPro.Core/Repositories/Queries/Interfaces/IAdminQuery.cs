@@ -8,6 +8,7 @@ namespace TaskTrackPro.Core.Repositories.Queries.Interfaces
 {
     public interface IAdminQuery
     {
-        Task<List<t_User>> GetAllUsers(); 
+        Task<List<t_User>> GetAllUsers();
+        Task<t_User?> GetUserById(int userId);
     }
 }
