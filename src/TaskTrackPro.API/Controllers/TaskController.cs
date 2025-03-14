@@ -72,44 +72,44 @@ namespace TaskTrackPro.API.Controllers
         }
 
 
-[HttpPut("update")]
-public async Task<IActionResult> UpdateTask([FromBody] t_task task)
-{
-    if (task == null || task.c_tid == 0)
-    {
-        return BadRequest("Invalid task data.");
-    }
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateTask([FromBody] t_task task)
+        {
+            if (task == null || task.c_tid == 0)
+            {
+                return BadRequest("Invalid task data.");
+            }
 
-    int result = await _taskRepository.Update(task);
+            int result = await _taskRepository.Update(task);
 
-    if (result > 0)
-    {
-        return Ok(new { message = "Task updated successfully!" });
-    }
-    else
-    {
-        return NotFound("Task not found or update failed.");
-    }
-}
-[HttpDelete("delete/{taskId}")]
-public async Task<IActionResult> DeleteTask(int taskId)
-{
-    if (taskId == 0)
-    {
-        return BadRequest("Invalid task ID.");
-    }
+            if (result > 0)
+            {
+                return Ok(new { message = "Task updated successfully!" });
+            }
+            else
+            {
+                return NotFound("Task not found or update failed.");
+            }
+        }
+        [HttpDelete("delete/{taskId}")]
+        public async Task<IActionResult> DeleteTask(int taskId)
+        {
+            if (taskId == 0)
+            {
+                return BadRequest("Invalid task ID.");
+            }
 
-    int result = await _taskRepository.Delete(taskId);
+            int result = await _taskRepository.Delete(taskId);
 
-    if (result > 0)
-    {
-        return Ok(new { message = "Task deleted successfully!" });
-    }
-    else
-    {
-        return NotFound("Task not found or delete failed.");
-    }
-}
+            if (result > 0)
+            {
+                return Ok(new { message = "Task deleted successfully!" });
+            }
+            else
+            {
+                return NotFound("Task not found or delete failed.");
+            }
+        }
 
     }
 }

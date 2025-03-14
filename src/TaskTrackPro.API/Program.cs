@@ -26,6 +26,7 @@ var connectionString = builder.Configuration.GetConnectionString("pgconnection")
 builder.Services.AddScoped<NpgsqlConnection>(_ => new NpgsqlConnection(connectionString));
 builder.Services.AddScoped<ITaskInterface, TaskRepository>();
 builder.Services.AddScoped<IAdminQuery, AdminQuery>();
+builder.Services.AddScoped<IAdminCommand, AdminCommand>();
 
 // ✅ Add services for Controllers & API
 builder.Services.AddControllers();

@@ -15,10 +15,12 @@ namespace TaskTrackPro.API.Controllers
     public class AdminController : Controller
     {
         private readonly IAdminQuery _adminQuery;
+        private readonly IAdminCommand _adminCommand;
 
-        public AdminController(IAdminQuery adminQuery)
+        public AdminController(IAdminQuery adminQuery, IAdminCommand adminCommand)
         {
             _adminQuery = adminQuery;
+            _adminCommand = adminCommand;
         }
 
         [HttpGet("users")]
@@ -33,6 +35,21 @@ namespace TaskTrackPro.API.Controllers
         {
             var user = await _adminQuery.GetUserById(userId);
             return Ok(user);
+        }
+
+        [HttpDelete("user/{userId}")]
+        public async Task<IActionResult> DeleteUser(int userId)
+        {
+            var isDeleted = await _adminCommand.DeleteUser(userId);
+
+            if (isDeleted)
+            {
+                return Ok(new { message = "User deleted successfully." });
+            }
+            else
+            {
+                return NotFound(new { message = "User not found or deletion failed." });
+            }
         }
     }
 }
