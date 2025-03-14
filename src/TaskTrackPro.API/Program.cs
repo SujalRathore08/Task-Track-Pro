@@ -2,8 +2,10 @@ using Npgsql;
 
 using TaskTrackPro.Core.Repositories.Commands.Implementations;
 using TaskTrackPro.Core.Repositories.Commands.Interfaces;
+using TaskTrackPro.Core.Repositories.Queries.Implementations;
+using TaskTrackPro.Core.Repositories.Queries.Interfaces;
 
- 
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +25,7 @@ builder.Services.AddCors(options =>
 var connectionString = builder.Configuration.GetConnectionString("pgconnection");
 builder.Services.AddScoped<NpgsqlConnection>(_ => new NpgsqlConnection(connectionString));
 builder.Services.AddScoped<ITaskInterface, TaskRepository>();
+builder.Services.AddScoped<IAdminQuery, AdminQuery>();
 
 // ✅ Add services for Controllers & API
 builder.Services.AddControllers();

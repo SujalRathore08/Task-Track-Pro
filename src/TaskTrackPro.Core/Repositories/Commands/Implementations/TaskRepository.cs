@@ -66,7 +66,7 @@ namespace TaskTrackPro.Core.Repositories.Commands.Implementations
                         c_email = reader.GetString(2),
                         c_gender = reader.GetString(4),
                         // c_profilepicture = reader.GetString(6)
-                           c_profilepicture = reader.IsDBNull(5) ? "default.png" : reader.GetString(5), 
+                        c_profilepicture = reader.IsDBNull(5) ? "default.png" : reader.GetString(5),
                     });
                 }
             }
@@ -79,7 +79,7 @@ namespace TaskTrackPro.Core.Repositories.Commands.Implementations
         }
 
 
-         public async Task<List<string>> GetApprovedUsernames()
+        public async Task<List<string>> GetApprovedUsernames()
         {
             var usernames = new List<string>();
 
@@ -106,36 +106,36 @@ namespace TaskTrackPro.Core.Repositories.Commands.Implementations
 
 
         public async Task<bool> ApproveUser(int userId)
-{
-    try
-    {
-        await using var conn = new NpgsqlConnection(_connectionString);
-        await conn.OpenAsync();
+        {
+            try
+            {
+                await using var conn = new NpgsqlConnection(_connectionString);
+                await conn.OpenAsync();
 
-        string query = "UPDATE t_user_task SET c_approve_status = TRUE WHERE c_uid = @userId";
+                string query = "UPDATE t_user_task SET c_approve_status = TRUE WHERE c_uid = @userId";
 
-        await using var cmd = new NpgsqlCommand(query, conn);
-        cmd.Parameters.AddWithValue("@userId", userId);
+                await using var cmd = new NpgsqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@userId", userId);
 
-        int rowsAffected = await cmd.ExecuteNonQueryAsync();
-        return rowsAffected > 0; // ✅ Returns true if update was successful
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Error: {ex.Message}");
-        return false;
-    }
-}
+                int rowsAffected = await cmd.ExecuteNonQueryAsync();
+                return rowsAffected > 0; // ✅ Returns true if update was successful
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                return false;
+            }
+        }
 
-        
-    public async Task<int> Update(t_task taskData)
-{
-    try
-    {
-        await using var conn = new NpgsqlConnection(_connectionString);
-        await conn.OpenAsync();
 
-        string query = @"
+        public async Task<int> Update(t_task taskData)
+        {
+            try
+            {
+                await using var conn = new NpgsqlConnection(_connectionString);
+                await conn.OpenAsync();
+
+                string query = @"
             UPDATE t_task 
             SET 
                 c_uid = @c_uid, 
@@ -146,49 +146,49 @@ namespace TaskTrackPro.Core.Repositories.Commands.Implementations
                 c_task_status = @c_task_status
             WHERE c_tid = @c_tid";
 
-        await using var cm = new NpgsqlCommand(query, conn);
+                await using var cm = new NpgsqlCommand(query, conn);
 
-        cm.Parameters.AddWithValue("@c_tid", taskData.c_tid); // ✅ Identify by Task ID
-        cm.Parameters.AddWithValue("@c_uid", taskData.c_uid);
-        cm.Parameters.AddWithValue("@c_task_title", taskData.c_task_title);
-        cm.Parameters.AddWithValue("@c_description", taskData.c_description);
-        cm.Parameters.AddWithValue("@c_start_date", taskData.c_start_date);
-        cm.Parameters.AddWithValue("@c_end_date", taskData.c_end_date);
-        cm.Parameters.AddWithValue("@c_task_status", taskData.c_task_status);
+                cm.Parameters.AddWithValue("@c_tid", taskData.c_tid); // ✅ Identify by Task ID
+                cm.Parameters.AddWithValue("@c_uid", taskData.c_uid);
+                cm.Parameters.AddWithValue("@c_task_title", taskData.c_task_title);
+                cm.Parameters.AddWithValue("@c_description", taskData.c_description);
+                cm.Parameters.AddWithValue("@c_start_date", taskData.c_start_date);
+                cm.Parameters.AddWithValue("@c_end_date", taskData.c_end_date);
+                cm.Parameters.AddWithValue("@c_task_status", taskData.c_task_status);
 
-        int rowsAffected = await cm.ExecuteNonQueryAsync();
-        return rowsAffected; // ✅ Returns number of affected rows
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Error: {ex.Message}");
-        return 0;
-    }
-}
+                int rowsAffected = await cm.ExecuteNonQueryAsync();
+                return rowsAffected; // ✅ Returns number of affected rows
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                return 0;
+            }
+        }
 
 
-       public async Task<int> Delete(int c_TaskID)
-{
-    try
-    {
-        await using var conn = new NpgsqlConnection(_connectionString);
-        await conn.OpenAsync();
+        public async Task<int> Delete(int c_TaskID)
+        {
+            try
+            {
+                await using var conn = new NpgsqlConnection(_connectionString);
+                await conn.OpenAsync();
 
-        string query = "DELETE FROM t_task WHERE c_tid = @c_TaskID";
+                string query = "DELETE FROM t_task WHERE c_tid = @c_TaskID";
 
-        await using var cm = new NpgsqlCommand(query, conn);
-        cm.Parameters.AddWithValue("@c_TaskID", c_TaskID);
+                await using var cm = new NpgsqlCommand(query, conn);
+                cm.Parameters.AddWithValue("@c_TaskID", c_TaskID);
 
-        int rowsAffected = await cm.ExecuteNonQueryAsync();
-        return rowsAffected; // ✅ Returns number of affected rows
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Error: {ex.Message}");
-        return 0;
-    }
-}
+                int rowsAffected = await cm.ExecuteNonQueryAsync();
+                return rowsAffected; // ✅ Returns number of affected rows
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                return 0;
+            }
+        }
 
-        
+
     }
 }
