@@ -4,35 +4,41 @@ using System.Linq;
 using System.Threading.Tasks;
 using Elastic.Clients.Elasticsearch;
 using TaskTrackPro.Core.Models;
+using Microsoft.Extensions.Configuration;
 
 namespace TaskTrackPro.API.Services
 {
-    public class ElasticssearchServices
+    public class ElasticsearchServices
     {
         private readonly ElasticsearchClient _client;
-        private string _indexName;
-        public ElasticssearchServices(IConfiguration configuration, ElasticsearchClient client)
+        private readonly string _indexName;
+
+        public ElasticsearchServices(IConfiguration configuration, ElasticsearchClient client)
         {
-            _indexName = configuration["Elasticsearch:DefaultIndex"];
+            _indexName = configuration["Elasticsearch:DefaultIndex"] ?? "task_index";
             _client = client;
         }
+
+        /// <summary>
+        /// Creates the index with the correct mapping for wildcard search.
+        /// </summary>
         public async Task<int> CreateIndexAsync()
         {
             var indexExistsResponse = await _client.Indices.ExistsAsync(_indexName);
             if (!indexExistsResponse.Exists)
             {
                 var createIndexResponse = await _client.Indices.CreateAsync<t_task>(index => index.Index(_indexName)
-                .Mappings(mappings => mappings.Properties(properties => properties
-                .IntegerNumber(x => x.c_tid)
-                .IntegerNumber(x => x.c_uid)
-                .Keyword(x => x.c_task_title)
-                .Keyword(x => x.c_description)
-                .Date(x => x.c_start_date)
-                .Date(x => x.c_end_date)
-                .Keyword(x => x.c_task_status)
-                )
-                )
+                    .Mappings(mappings => mappings.Properties(properties => properties
+                        .IntegerNumber(x => x.c_tid)
+                        .IntegerNumber(x => x.c_uid)
+                        .Text(x => x.c_task_title, t => t.Fielddata(true)) // Enable fielddata for text field
+                        .Text(x => x.c_description)
+                        .Date(x => x.c_start_date)
+                        .Date(x => x.c_end_date)
+                        .Keyword(x => x.c_task_status)
+                    ))
                 );
+
                 if (!createIndexResponse.IsValidResponse)
                 {
                     Console.WriteLine($"Failed to create index: {createIndexResponse.DebugInformation}");
@@ -47,25 +53,45 @@ namespace TaskTrackPro.API.Services
                 return 0;
             }
         }
-        public async Task IndexTaskAsync(t_task task){
-            var resposnse = await _client.IndexAsync(task, idx => idx.Index(_indexName));
-            if (!resposnse.IsValidResponse)
+
+        /// <summary>
+        /// Indexes a new task document into Elasticsearch.
+        /// </summary>
+        public async Task IndexTaskAsync(t_task task)
+        {
+            var response = await _client.IndexAsync(task, idx => idx.Index(_indexName));
+            if (!response.IsValidResponse)
             {
-                Console.WriteLine($"Failed to index task: {resposnse.DebugInformation}");
+                Console.WriteLine($"Failed to index task: {response.DebugInformation}");
+            }
+            else
+            {
+                Console.WriteLine("Task indexed successfully.");
             }
         }
 
-        public async Task<t_task?> SearchContactNameAsync(string name){
+        /// <summary>
+        /// Searches for tasks based on a wildcard match in the task title.
+        /// </summary>
+        public async Task<List<t_task>> SearchTaskByTitleAsync(string name)
+        {
             var response = await _client.SearchAsync<t_task>(s => s
-            .Query(q => q.Wildcard(w => w
-            .Field(f => f.c_task_title.Suffix("keyword")).Value($"*{name}*"))));
-            Console.WriteLine(response);
-            if(response == null || response.Documents == null){
-                Console.WriteLine(" ElasticSearch query returned null or invalid response.");
-return null;
+                .Index(_indexName)
+                .Query(q => q.Wildcard(w => w
+                    .Field(f => f.c_task_title) // Use the text field for wildcard search
+                    .Value($"*{name}*")
+                    .CaseInsensitive(true) // Ensure case insensitivity
+                ))
+            );
+
+            if (response == null || response.Documents == null)
+            {
+                Console.WriteLine("Elasticsearch query returned null or invalid response.");
+                return new List<t_task>();
             }
-            return response.Documents.FirstOrDefault();
+
+            Console.WriteLine($"Search completed. Found {response.Documents.Count} tasks.");
+            return response.Documents.ToList();
         }
     }
-
 }
