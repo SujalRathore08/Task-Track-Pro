@@ -417,6 +417,37 @@
                     }
                 }
             });
+        LoadGridData()
+        $('#ElasticClear').click(function(){
+            LoadGridData()
+        })
+
+        function LoadGridData()
+        {
+            // Fetch Data from API
+            var taskDataSource = new kendo.data.DataSource({
+                transport: {
+                    read: {
+                        url: "http://localhost:5136/api/task/tasks",
+                        dataType: "json"
+                    }
+                },
+                pageSize: 5,
+                schema: {
+                    model: {
+                        id: "c_tid",
+                        fields: {
+                            c_tid: { type: "number" },
+                            c_uid: { type: "number" },
+                            c_task_title: { type: "string" },
+                            c_description: { type: "string" },
+                            c_start_date: { type: "date" },
+                            c_end_date: { type: "date" },
+                            c_task_status: { type: "string" }
+                        }
+                    }
+                }
+            });
 
             // Initialize Kendo Grid
             $("#taskGrid").kendoGrid({
@@ -601,3 +632,4 @@
         });
     })
 </script>
+
