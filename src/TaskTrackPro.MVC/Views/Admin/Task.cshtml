@@ -7,7 +7,6 @@
         <li><a asp-action="Index" id="iAuditDashboard" class="ms-menu-link">Dashboard</a></li>
         <li><a asp-action="Members" id="iAuditTemplate" class="ms-menu-link">Members</a></li>
         <li><a href="javascript:void(0);" id="iAuditInspection" class="ms-menu-link active">Task</a></li>
-        <li><a asp-action="Reports" id="iAuditSchdules" class="ms-menu-link">Reports</a></li>
         <li><a asp-action="Messages" id="iAuditAnalytics" class="ms-menu-link">Messages</a></li>
     </ul>
 </section>
@@ -97,13 +96,12 @@
 </div>
 
 @* Delete Task Model *@
-$("#DeltaskDescription").val(dataItem.c_description);
 <div id="delete-window-table">
     <div class="window-wrapper">
         <input id="DeltaskId" hidden type="text">
         <div class="mb-10">
             <h5 class="fw-bolder">Task Name</h5>
-            <p id="UpdateTaskTitle">This is task name</p>
+            <p id="DelTaskTitle">This is task name</p>
         </div>
         <div class="mb-10">
             <h5 class="fw-bolder">Member</h5>
@@ -137,7 +135,7 @@ $("#DeltaskDescription").val(dataItem.c_description);
             <input hidden type="text" id="taskId">
             <div class="form-group">
                 <label>Task Title</label>
-                <input id="UpdateTaskTitle" type="text" class="form-control" title="table name">
+                <input id="UpdateTaskTitle" type="text" class="form-control" >
             </div>
             <div class="form-group mb-10">
                 <label for="UpdateusersList">Select Member</label>
@@ -175,7 +173,6 @@ $("#DeltaskDescription").val(dataItem.c_description);
 </div>
 @* Show Add Task Model *@
 <script>
-
     $("#task-window-table").kendoWindow({
         width: 450,
         title: "Add New Task",
@@ -191,7 +188,6 @@ $("#DeltaskDescription").val(dataItem.c_description);
     $(document).on('click', '.btn-add-task', function () {
         $("#task-window-table").data("kendoWindow").center().open();
     });
-
 </script>
 
 @* Delete Task *@

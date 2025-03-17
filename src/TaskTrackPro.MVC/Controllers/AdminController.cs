@@ -29,12 +29,6 @@ namespace TaskTrackPro.Mvc.Controllers
             return View();
         }
 
-        public IActionResult Reports()
-        {
-            // User Management 
-            return View();
-        }
-
         public IActionResult Messages()
         {
             // User Management 

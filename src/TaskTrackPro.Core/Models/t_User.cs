@@ -21,7 +21,8 @@ namespace TaskTrackPro.Core.Models
         public string c_password { get; set; }
         public string c_gender { get; set; }
 
-        public string? c_profilepicture { get; set; }    
+        public string? c_profilepicture { get; set; }   
+        public bool c_user_status { get; set; } 
 
         public IFormFile? c_profile { get; set; }
     }

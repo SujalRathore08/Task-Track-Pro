@@ -7,7 +7,6 @@
         <li><a asp-action="Index" id="iAuditDashboard" class="ms-menu-link">Dashboard</a></li>
         <li><a href="javascript:void(0);" id="iAuditTemplate" class="ms-menu-link active">Members</a></li>
         <li><a asp-action="Task" id="iAuditInspection" class="ms-menu-link">Task</a></li>
-        <li><a asp-action="Reports" id="iAuditSchdules" class="ms-menu-link">Reports</a></li>
         <li><a asp-action="Messages" id="iAuditAnalytics" class="ms-menu-link">Messages</a></li>
     </ul>
 </section>
@@ -69,11 +68,57 @@
     </li>
 </ul>
 
+@* Approv User model *@
+<div id="task-window-table">
+    <div class="window-wrapper">
+        <input id="UserId" type="text">
+        <div class="mb-10">
+
+            <img src="https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg"
+                alt="">
+        </div>
+        <div class="mb-10">
+            <h5 class="fw-bolder">User Name</h5>
+            <p id="Username"></p>
+        </div>
+        <div class="mb-10">
+            <h5 class="fw-bolder">User Email</h5>
+            <p id="Useremail"></p>
+        </div>
+        <div class="mb-10">
+            <h5 class="fw-bolder">Gender</h5>
+            <p id="UserGender"></p>
+        </div>
+        <div class="mb-10">
+            <h5 class="fw-bolder">User Status</h5>
+            <p>Not Approved</p>
+        </div>
+    </div>
+    <div class="window-footer">
+        <a class="btn btn-trans close-window">Cancel</a><a id="approveUserBtn" class="btn btn-primary">Save</a>
+    </div>
+</div>
+
+@* Show Approv user script *@
+<script>
+    $("#task-window-table").kendoWindow({
+        width: 450,
+        title: "Approve User",
+        visible: false,
+        draggable: false,
+        resizable: false,
+        actions: [
+            "Close"
+        ],
+        modal: true
+    }).data("kendoWindow");
+
+    $(document).on('click', '.not-approve-btn', function () {
+        $("#task-window-table").data("kendoWindow").center().open();
+    });
+</script>
 
 <script>
-    // Grid
-
-
     $("#Dataimportgrid").kendoGrid({
         dataSource: fieldData,
         totalRecordPerPage: 5,
@@ -127,8 +172,7 @@
     });
 </script>
 
-
-<script>
+@* <script>
     $(document).ready(function () {
         // Fetch Data from API
         $.ajax({
@@ -137,16 +181,15 @@
             dataType: "json",
             success: function (data) {
                 var formattedData = data.map((user, index) => ({
-                    datano: index + 1,            // Auto-increment No
-                    dataid: user.c_uid,           // User ID
-                    datareq: user.c_uname,        // Name
-                    dataTpl: user.c_email,        // Email
-                    dataAss: user.c_gender,       // Gender
-                    dataVal: user.c_profilepicture, // Profile Picture
-                    dataInt: "N/A"                // Placeholder for extra field
+                    datano: index,
+                    dataid: user.c_uid,
+                    datareq: user.c_uname,
+                    dataTpl: user.c_email,
+                    dataAss: user.c_gender,
+                    dataVal: user.c_profilepicture,
+                    dataInt: user.c_user_status
                 }));
 
-                // Initialize Kendo Grid
                 $("#Dataimportgrid").kendoGrid({
                     dataSource: {
                         data: formattedData,
@@ -167,13 +210,133 @@
                             field: "dataVal", title: "Profile Picture", width: "150px",
                             template: "<img src='/images/#: dataVal #' width='50' height='50' alt='Profile' />"
                         },
-                        { field: "dataInt", title: "Iteration No", width: "150px" }
-                    ]
+                        {
+                            field: "dataInt",
+                            title: "Action",
+                            width: "150px",
+                            template: function (dataItem) {
+                                if (dataItem.dataInt) {
+                                    return "<button class='btn btn-success approve-btn' data-id='" + dataItem.dataid + "'>Approved</button>";
+                                } else {
+                                    return "<button class='btn btn-danger  not-approve-btn' data-id='" + dataItem.dataid + "'>Not Approved</button>";
+                                }
+                            }
+                        }
+                    ],
+                    dataBound: function () {
+                        $(".not-approve-btn").click(function () {
+                            var grid = $("#Dataimportgrid").data("kendoGrid");
+                            var row = $(this).closest("tr");
+                            var dataItem = grid.dataItem(row);
+
+                            if (dataItem) {
+                                $("#UserId").val(dataItem.c_tid);
+                                $("#UpdateTaskTitle").val(dataItem.c_task_title);
+                                $("#UpdateusersList").val(dataItem.c_uid);
+                                $("#Updatestartdatetimepicker").val(new Date(dataItem.c_start_date).toISOString().slice(0, 16));
+                                $("#Updateenddatetimepicker").val(new Date(dataItem.c_end_date).toISOString().slice(0, 16));
+                                $("#UpdatetaskDescription").val(dataItem.c_description);
+                            }
+                        });
+                    });
+            },
+            error: function () {
+                alert("Failed to fetch data.");
+            }
+        });
+
+
+    });
+</script> *@
+
+
+
+<script>
+    $(document).ready(function () {
+        const apiUrl = "http://localhost:5136/api/task";
+        // Fetch Data from API
+        $.ajax({
+            url: "http://localhost:5136/api/Admin/users", // Adjust API URL if needed
+            type: "GET",
+            dataType: "json",
+            success: function (data) {
+                var formattedData = data.map((user, index) => ({
+                    datano: index,
+                    dataid: user.c_uid,
+                    datareq: user.c_uname,
+                    dataTpl: user.c_email,
+                    dataAss: user.c_gender,
+                    dataVal: user.c_profilepicture,
+                    dataInt: user.c_user_status
+                }));
+
+                $("#Dataimportgrid").kendoGrid({
+                    dataSource: {
+                        data: formattedData,
+                        pageSize: 5
+                    },
+                    pageable: true,
+                    scrollable: true,
+                    resizable: false,
+                    autoBind: true,
+                    columns: [
+                        { selectable: true, width: "50px" },
+                        { field: "datano", title: "No", width: "90px" },
+                        { field: "dataid", title: "ID", width: "135px" },
+                        { field: "datareq", title: "Name", width: "200px" },
+                        { field: "dataTpl", title: "Email", width: "200px" },
+                        { field: "dataAss", title: "Gender", width: "120px" },
+                        {
+                            field: "dataVal", title: "Profile Picture", width: "150px",
+                            template: "<img src='/images/#: dataVal #' width='50' height='50' alt='Profile' />"
+                        },
+                        {
+                            field: "dataInt",
+                            title: "Action",
+                            width: "150px",
+                            template: function (dataItem) {
+                                if (dataItem.dataInt) {
+                                    return "<button class='btn btn-success approve-btn' data-id='" + dataItem.dataid + "'>Approved</button>";
+                                } else {
+                                    return "<button class='btn btn-danger not-approve-btn' data-id='" + dataItem.dataid + "'>Not Approved</button>";
+                                }
+                            }
+                        }
+                    ],
+                    dataBound: function () {
+                        $(".not-approve-btn").off("click").on("click", function () {
+                            var grid = $("#Dataimportgrid").data("kendoGrid");
+                            var row = $(this).closest("tr");
+                            var dataItem = grid.dataItem(row);
+
+                            if (dataItem) {
+                                $("#UserId").val(dataItem.dataid);
+                                $("#Username").html(dataItem.datareq);
+                                $("#Useremail").html(dataItem.dataTpl);
+                                $("#UserGender").html(dataItem.dataAss);
+                            }
+                        });
+                    }
                 });
             },
             error: function () {
                 alert("Failed to fetch data.");
             }
         });
+        // Approve User
+        $("#approveUserBtn").click(function () {
+            let userId = $("#UserId").val();
+            $.ajax({
+                url: apiUrl + "/approve/" + userId,
+                type: "PUT",
+                success: function (response) {
+                    alert(response.message);
+                },
+                error: function (xhr) {
+                    alert("Error approving user: " + xhr.responseText);
+                }
+            });
+        });
     });
+
 </script>

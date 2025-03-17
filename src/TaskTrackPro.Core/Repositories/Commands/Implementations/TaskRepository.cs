@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Npgsql;
 using TaskTrackPro.Core.Models;
 using TaskTrackPro.Core.Repositories.Commands.Interfaces;
+using TaskTrackPro.Core.Services;
 
 namespace TaskTrackPro.Core.Repositories.Commands.Implementations
 {
