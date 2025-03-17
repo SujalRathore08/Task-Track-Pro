@@ -10,8 +10,10 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
 using TaskTrackPro.API.Services;
+using Elastic.Transport;
+using Elastic.Clients.Elasticsearch;
 
-    var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 
 // ✅ Configure CORS Policy (Ensures cross-origin access for frontend)
 builder.Services.AddCors(options =>
@@ -33,6 +35,7 @@ builder.Services.AddScoped<IAdminQuery, AdminQuery>();
 builder.Services.AddScoped<IAdminCommand, AdminCommand>();
 builder.Services.AddScoped<IAccountCommand, AccountCommand>();
 builder.Services.AddScoped<ChatService>();
+builder.Services.AddSingleton<ElasticssearchServices>();
 
 // ✅ Configure Redis Connection
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
@@ -72,7 +75,47 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDistributedMemoryCache(); // For in-memory session storage
 
+builder.Services.AddSingleton(provider =>
+{
+    var configuration = builder.Configuration;
+    var settings = new ElasticsearchClientSettings(new
+    Uri(configuration["Elasticsearch:Uri"]))
+    .ServerCertificateValidationCallback(CertificateValidations.AllowAll)
+    .DefaultIndex(configuration["Elasticsearch:DefaultIndex"])
+    .Authentication(new
+    BasicAuthentication(configuration["Elasticsearch:Username"],
+    configuration["Elasticsearch:Password"]))
+    .DisableDirectStreaming();
+    return new ElasticsearchClient(settings);
+});
+
+
 var app = builder.Build();
+
+async Task IndexDataOnStartup(){
+    using var scope = app.Services.CreateScope();
+    var contactRepo = scope.ServiceProvider.GetRequiredService<ITaskInterface>();
+    var elasticService = scope.ServiceProvider.GetRequiredService<ElasticssearchServices>();    
+
+    try{
+        await elasticService.CreateIndexAsync();
+        var tasks = await contactRepo.GetAllTask();
+        if(tasks.Count > 0){
+            foreach(var task in tasks){
+                await elasticService.IndexTaskAsync(task);
+            }
+            Console.WriteLine($" {tasks.Count} contacts indexed successfully in ElasticSearch.");
+        }else{
+            Console.WriteLine("No tasks found to index in ElasticSearch.");
+        }
+    }
+    catch(Exception ex){
+        Console.WriteLine($"Error while indexing data in ElasticSearch: {ex.Message}");
+    }
+}
+
+await IndexDataOnStartup();
+
 
 // ✅ Use CORS Middleware (Must be before `UseAuthorization`)
 app.UseCors("corsapp");

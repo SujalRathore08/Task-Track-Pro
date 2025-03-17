@@ -34,6 +34,8 @@
                                 <a href="javascript:void(0);" class="btn btn-raised btn-primary btn-block mr-5"
                                     role="button" aria-haspopup="true" aria-expanded="false" id="actionbtnmenu1"><i
                                         aria-hidden="true" class="icon-search"></i><span>Search</span></a>
+
+
                                 <a href="javascript:void(0);"
                                     class="btn btn-raised btn-primary btn-add-task btn-block ml-5" role="button"
                                     aria-haspopup="true" aria-expanded="false" id="actionbtnmenu1"><i aria-hidden="true"
@@ -486,3 +488,23 @@
     });
 
 </script>
+
+<script>
+    document.getElementById('actionbtnmenu1').addEventListener('click', function () {
+        let searchValue = document.getElementById('txtTagListSearch').value.trim();
+        if (searchValue) {
+            fetch(`http://localhost:5136/api/Admin/${encodeURIComponent(searchValue)}`)
+                .then(response => response.json())
+                .then(data => console.log(data)) // Handle API response
+                .catch(error => console.error('Error:', error));
+        } else {
+            alert("Please enter a search term.");
+        }
+    });
+
+    // Clear input field on clicking the clear button
+    document.getElementById('btnTagListSearch').addEventListener('click', function () {
+        document.getElementById('txtTagListSearch').value = "";
+    });
+</script>
+

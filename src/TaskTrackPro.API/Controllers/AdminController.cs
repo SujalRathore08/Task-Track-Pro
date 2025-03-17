@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Elastic.Clients.Elasticsearch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using TaskTrackPro.API.Services;
+using TaskTrackPro.Core.Models;
 using TaskTrackPro.Core.Repositories.Commands.Interfaces;
 using TaskTrackPro.Core.Repositories.Queries.Interfaces;
 
@@ -17,11 +20,39 @@ namespace TaskTrackPro.API.Controllers
         private readonly IAdminQuery _adminQuery;
         private readonly IAdminCommand _adminCommand;
 
-        public AdminController(IAdminQuery adminQuery, IAdminCommand adminCommand)
+        private readonly ElasticssearchServices _elasticssearchServices;
+        private readonly ITaskInterface _taskInterface;
+
+        public AdminController(IAdminQuery adminQuery,ElasticssearchServices elasticssearchServices, IAdminCommand adminCommand, ITaskInterface taskInterface)
         {
             _adminQuery = adminQuery;
-            _adminCommand = adminCommand;
+            _adminCommand = _adminCommand;
+            _elasticssearchServices = elasticssearchServices;
+            _taskInterface = taskInterface;
         }
+
+        [HttpGet("{name}")]
+        public async Task<IActionResult> SearchTask(string name)
+        {
+            var task = await _elasticssearchServices.SearchContactNameAsync(name);
+            return Ok(task);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllTasks(){
+            string c_uid ="";
+            List<t_task> list;
+            if (c_uid == "")
+            {
+                list = await _taskInterface.GetAllTask();
+            }
+            else
+            {
+                list = await _taskInterface.GetTaskById(Convert.ToInt32(c_uid));
+            }
+            return Ok(list);
+        }
+
 
         [HttpGet("users")]
         public async Task<IActionResult> GetAllUsers()
