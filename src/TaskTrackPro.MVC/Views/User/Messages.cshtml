@@ -227,7 +227,7 @@
                     let chatBox = $("#chatBox");
                     chatBox.empty();
                     let lastDate = "";
- 
+
                     response.data.forEach(msg => {
                         let messageDate = new Date(msg.timestamp).toLocaleDateString();
                         let messageTime = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });

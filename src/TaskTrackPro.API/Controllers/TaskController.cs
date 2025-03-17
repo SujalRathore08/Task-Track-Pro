@@ -66,6 +66,13 @@ namespace TaskTrackPro.API.Controllers
             return Ok(users);
         }
 
+        [HttpGet("task")]
+        public async Task<IActionResult> GetTasksByid(int userId)
+        {
+            var users = await _taskRepository.GetTaskById(userId);
+            return Ok(users);
+        }
+
 
         [HttpPut("approve/{userId}")]
         public async Task<IActionResult> ApproveUser(int userId)
