@@ -23,96 +23,107 @@ namespace TaskTrackPro.API.Controllers
             _redisService = redisService;
         }
 
-         [HttpPost("set")]
-    public async Task<IActionResult> SetData(string key, string value)
-    {
-        bool isSet = await _redisService.SetAsync(key, value, 600); // Store data for 10 minutes
-        return Ok(new { success = isSet, message = isSet ? "Data stored in Redis" : "Failed to store data" });
-    }
+        [HttpPost("set")]
+        public async Task<IActionResult> SetData(string key, string value)
+        {
+            bool isSet = await _redisService.SetAsync(key, value, 600); // Store data for 10 minutes
+            return Ok(new { success = isSet, message = isSet ? "Data stored in Redis" : "Failed to store data" });
+        }
 
-    [HttpGet("pop")]
-    public async Task<IActionResult> PopData(string key)
-    {
-        string value = await _redisService.PopAsync(key);
-        if (value != null)
+        [HttpGet("pop")]
+        public async Task<IActionResult> PopData(string key)
         {
-            return Ok(new { success = true, message = "Data retrieved and deleted", data = value });
+            string value = await _redisService.PopAsync(key);
+            if (value != null)
+            {
+                return Ok(new { success = true, message = "Data retrieved and deleted", data = value });
+            }
+            else
+            {
+                return Ok(new { success = false, message = "No data found" });
+            }
         }
-        else
-        {
-            return Ok(new { success = false, message = "No data found" });
-        }
-    }
 
         [HttpPost]
         [Route("Register")]
         public async Task<IActionResult> Register([FromForm] t_User user)
         {
 
-            var status = await _accountCommand.Register(user);
-            if (status == 1)
+            if (user.c_profile != null && user.c_profile.Length > 0)
             {
-                return Ok(new { success = true, message = "User Registered" });
+                var fileName = user.c_email + Path.GetExtension(
+                    user.c_profile.FileName
+                );
+                var filePath = Path.Combine("../TaskTrackPro.MVC/wwwroot/profile_images", fileName);
+                user.c_profilepicture = fileName;
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await user.c_profile.CopyToAsync(fileStream);
+                }
             }
-            else if (status == 0)
+            Console.WriteLine(user.c_profilepicture);
+            try
             {
-                return Ok(new { success = false, message = "User Already Exist" });
+                var result = await _accountCommand.Register(user);
+                if (result == 1)
+                {
+                    return Ok(new { message = "User registered successfully." });
+                }
+                else
+                {
+                    return BadRequest(new { message = "User registration failed." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while registering user.", error = ex.Message });
+            }
+        }
+
+
+        [HttpPost]
+        [Route("Login")]
+        public async Task<IActionResult> Login([FromForm] vm_Login user)
+        {
+            string redisKey = $"user:{user.c_email}";
+            var cachedUser = await _redisService.GetUserDataAsync(redisKey);
+
+            if (cachedUser != null)
+            {
+                return Ok(new
+                {
+                    success = true,
+                    message = "Login Successful (Cached)",
+                    user = cachedUser
+                });
+            }
+
+            var userData = await _accountCommand.Login(user);
+            if (userData != null)
+            {
+                var userObject = new t_User
+                {
+                    c_uid = userData.c_uid,
+                    c_uname = userData.c_uname,
+                    c_email = userData.c_email,
+                    c_gender = userData.c_gender
+                };
+
+                // ✅ Store in Redis
+                bool isStored = await _redisService.SetUserDataAsync(redisKey, userObject, 1800); // 30 min expiry
+                Console.WriteLine($"[Login API] Redis Set Status: {isStored}");
+
+                return Ok(new
+                {
+                    success = true,
+                    message = "Login Successful",
+                    user = userObject
+                });
             }
             else
             {
-                return BadRequest(new
-                {
-                    success = false,
-                    message = "There was some error while Registration"
-                });
+                return Ok(new { success = false, message = "Invalid Email or Password" });
             }
         }
-        
-
-        [HttpPost]
-[Route("Login")]
-public async Task<IActionResult> Login([FromForm] vm_Login user)
-{
-    string redisKey = $"user:{user.c_email}";
-    var cachedUser = await _redisService.GetUserDataAsync(redisKey);
-
-    if (cachedUser != null)
-    {
-        return Ok(new
-        {
-            success = true,
-            message = "Login Successful (Cached)",
-            user = cachedUser
-        });
-    }
-
-    var userData = await _accountCommand.Login(user);
-    if (userData != null)
-    {
-        var userObject = new t_User
-        {
-            c_uid = userData.c_uid,
-            c_uname = userData.c_uname,
-            c_email = userData.c_email,
-            c_gender = userData.c_gender
-        };
-
-        // ✅ Store in Redis
-        bool isStored = await _redisService.SetUserDataAsync(redisKey, userObject, 1800); // 30 min expiry
-        Console.WriteLine($"[Login API] Redis Set Status: {isStored}");
-
-        return Ok(new
-        {
-            success = true,
-            message = "Login Successful",
-            user = userObject
-        });
-    }
-    else
-    {
-        return Ok(new { success = false, message = "Invalid Email or Password" });
-    }
-}
-
     }
 }
