@@ -15,9 +15,9 @@
 
 <!--// Main Section-->
 <div class="d-flex dashboard-wrapper justify-content-center align-items-center h100 mt-15 ">
-<div class="d-flex dashboard-wrapper justify-content-center align-items-center h100 mt-15 ">
     <div class="dashboard-left   d-flex flex-column h100">
         <div class="row-container h100">
+
             <div class="col-width-100 h100 ">
                 <div class="scrum-dataimport-wrapper d-flex flex-column h100">
                     <div class="scrum-dataimport-header-block bg-light d-flex border mb-15">
@@ -41,37 +41,7 @@
                                         class="icon-add"></i><span>Task</span></a>
                             </div>
                         </div>
-            <div class="col-width-100 h100 ">
-                <div class="scrum-dataimport-wrapper d-flex flex-column h100">
-                    <div class="scrum-dataimport-header-block bg-light d-flex border mb-15">
 
-                        <div class="searchbar w100 p-10 pb-5">
-                            <div class="clear-input search-box w100">
-                                <input type="text" name="txtTagListSearch" id="txtTagListSearch" aria-label="tag name"
-                                    class="form-control k-textbox k-valid" placeholder="Search Task here...">
-                                <i class="icon-search" aria-hidden="true"></i>
-                                <a role="button" id="btnTagListSearch" aria-label="Clear Search"
-                                    href="javascript:void(0);" class="btn-icn-hover close icon-cancel"
-                                    data-ara-title="Clear Search"></a>
-                            </div>
-                            <div class="action-div d-flex">
-                                <a href="javascript:void(0);" class="btn btn-raised btn-primary btn-block mr-5"
-                                    role="button" aria-haspopup="true" aria-expanded="false" id="actionbtnmenu1"><i
-                                        aria-hidden="true" class="icon-search"></i><span>Search</span></a>
-                                <a href="javascript:void(0);"
-                                    class="btn btn-raised btn-primary btn-add-task btn-block ml-5" role="button"
-                                    aria-haspopup="true" aria-expanded="false" id="actionbtnmenu1"><i aria-hidden="true"
-                                        class="icon-add"></i><span>Task</span></a>
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="flex-1 overflow-auto">
-                        <div class="grid-wrapper h100 dataimport-grid">
-                            <div id="taskGrid"></div>
-                            <div id="Dataimportgrid-pager" class="with-more-option"></div>
-                        </div>
-                    </div>
                     </div>
                     <div class="flex-1 overflow-auto">
                         <div class="grid-wrapper h100 dataimport-grid">
@@ -80,10 +50,17 @@
                         </div>
                     </div>
                 </div>
+                <div class="flex-1 overflow-auto">
+                    <div class="grid-wrapper h100 dataimport-grid">
+                        <div id="taskGrid m-15"></div>
+                        <div id="Dataimportgrid-pager" class="with-more-option"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
 
 
 <div id="task-window-table">
@@ -91,7 +68,6 @@
         <form id="taskForm">
             <div class="form-group">
                 <label>Task Title</label>
-                <input id="taskName" type="text" class="form-control" title="table name">
                 <input id="taskName" type="text" class="form-control" title="table name">
             </div>
             <div class="form-group mb-10">
@@ -112,43 +88,45 @@
                 <label>Description <span class="text-muted">(Optional)</span></label>
                 <textarea id="taskDescription" class="form-control" rows="4" placeholder="Write here"
                     title="description"></textarea>
-                <textarea id="taskDescription" class="form-control" rows="4" placeholder="Write here"
-                    title="description"></textarea>
             </div>
         </form>
     </div>
     <div class="window-footer">
         <a class="btn btn-trans close-window">Cancel</a><a id="addTaskBtn" class="btn btn-primary">Save</a>
-        <a class="btn btn-trans close-window">Cancel</a><a id="addTaskBtn" class="btn btn-primary">Save</a>
     </div>
 </div>
 
 @* Delete Task Model *@
+$("#DeltaskDescription").val(dataItem.c_description);
 <div id="delete-window-table">
     <div class="window-wrapper">
+        <input id="DeltaskId" hidden type="text">
         <div class="mb-10">
-            <h5>Task Name</h5>
-            <p>This is task name</p>
+            <h5 class="fw-bolder">Task Name</h5>
+            <p id="UpdateTaskTitle">This is task name</p>
         </div>
         <div class="mb-10">
-            <h5>Member</h5>
-            <p>Henil</p>
+            <h5 class="fw-bolder">Member</h5>
+            <p id="DelusersList">Henil</p>
         </div>
         <div class="mb-10">
-            <h5>Task Status</h5>
+            <h5 class="fw-bolder">Task Status</h5>
             <p>Complete</p>
         </div>
         <div class="mb-10">
-            <h5>Task Duration</h5>
-            <p>25/01/2003 - 25/02/2023</p>
+            <h5 class="fw-bolder">Task Duration</h5>
+            <p>
+
+            <span id="Delstartdatetimepicker"></span> -- <span id="Delenddatetimepicker"></span>
+            </p>
         </div>
         <div class="mb-10">
-            <h5>Task Description</h5>
-            <p>This is Task Description</p>
+            <h5 class="fw-bolder">Task Description</h5>
+            <p id="DeltaskDescription"></p>
         </div>
     </div>
     <div class="window-footer">
-        <a class="btn btn-trans close-window">Cancel</a><a class="btn btn-primary">Delete</a>
+        <a class="btn btn-trans close-window">Cancel</a><a id="DelTask" class="btn btn-primary">Delete</a>
     </div>
 </div>
 
@@ -162,23 +140,16 @@
                 <input id="UpdateTaskTitle" type="text" class="form-control" title="table name">
             </div>
             <div class="form-group mb-10">
-                <label for="UpdateautoComplete">Select Member</label>
-                <input id="UpdateautoComplete" class="form-control border b-1" title="date timepicker" />
-                <input id="UpdateTaskTitle" type="text" class="form-control" title="table name">
-            </div>
-            <div class="form-group mb-10">
-                <label for="UpdateautoComplete">Select Member</label>
-                <input id="UpdateautoComplete" class="form-control border b-1" title="date timepicker" />
+                <label for="UpdateusersList">Select Member</label>
+                <select id="UpdateusersList" class="form-control">
+                    <option disabled selected value="">Select Member</option>
+                </select>
             </div>
             <div class="form-group mb-10">
                 <label for="Updatestartdatetimepicker">Start Date Timepicker</label>
                 <input id="Updatestartdatetimepicker" class="form-control" title="date timepicker" />
-                <label for="Updatestartdatetimepicker">Start Date Timepicker</label>
-                <input id="Updatestartdatetimepicker" class="form-control" title="date timepicker" />
             </div>
             <div class="form-group mb-10">
-                <label for="Updateenddatetimepicker">End Date Timepicker</label>
-                <input id="Updateenddatetimepicker" class="form-control" title="date timepicker" />
                 <label for="Updateenddatetimepicker">End Date Timepicker</label>
                 <input id="Updateenddatetimepicker" class="form-control" title="date timepicker" />
             </div>
@@ -199,7 +170,6 @@
         </form>
     </div>
     <div class="window-footer">
-        <a class="btn btn-trans close-window">Cancel</a><a id="updateTaskBtn" class="btn btn-primary">Save</a>
         <a class="btn btn-trans close-window">Cancel</a><a id="updateTaskBtn" class="btn btn-primary">Save</a>
     </div>
 </div>
@@ -339,15 +309,17 @@
         };
 
         // Get Approved Usernames
-        function LoaduserData () {
+        function LoaduserData() {
             $.ajax({
                 url: apiUrl + "/approved-users",
                 type: "GET",
                 success: function (users) {
                     let usersDropdown = $("#usersList");
+                    let usersDropdown2 = $("#UpdateusersList");
                     users.forEach(user => {
                         let option = `<option value="${user.c_uid}">${user.c_uname}</option>`;
                         usersDropdown.append(option);
+                        usersDropdown2.append(option);
                     });
                 },
                 error: function (xhr) {
@@ -398,8 +370,8 @@
         });
 
         // Delete Task
-        $("#deleteTaskBtn").click(function () {
-            let taskId = $("#taskId").val();
+        $("#DelTask").click(function () {
+            let taskId = $("#DeltaskId").val();
             $.ajax({
                 url: apiUrl + "/delete/" + taskId,
                 type: "DELETE",
@@ -486,37 +458,27 @@
                     if (dataItem) {
                         $("#taskId").val(dataItem.c_tid);
                         $("#UpdateTaskTitle").val(dataItem.c_task_title);
-                        $("#UpdateautoComplete").val(dataItem.c_uid);
+                        $("#UpdateusersList").val(dataItem.c_uid);
                         $("#Updatestartdatetimepicker").val(new Date(dataItem.c_start_date).toISOString().slice(0, 16));
                         $("#Updateenddatetimepicker").val(new Date(dataItem.c_end_date).toISOString().slice(0, 16));
                         $("#UpdatetaskDescription").val(dataItem.c_description);
                     }
                 });
 
-                $(".btn-edit-task").click(function () {
+                $(".btn-delete-task").click(function () {
                     var grid = $("#taskGrid").data("kendoGrid");
                     var row = $(this).closest("tr");
                     var dataItem = grid.dataItem(row);
 
-                    console.log(dataItem)
-
-    @* if (dataItem) {
-                    if (confirm("Are you sure you want to delete this task?")) {
-                        $.ajax({
-                            url: "http://localhost:5136/api/task/delete/" + dataItem.c_tid,
-                            type: "DELETE",
-                            success: function () {
-                                alert("Task deleted successfully!");
-                                grid.dataSource.read(); // Refresh grid
-                            },
-                            error: function (xhr) {
-                                console.error(xhr.responseText);
-                                alert("Error deleting task.");
-                            }
-                        });
+                    if (dataItem) {
+                        $("#DeltaskId").val(dataItem.c_tid);
+                        $("#DelTaskTitle").html(dataItem.c_task_title);
+                        $("#DelusersList").html(dataItem.c_uid);
+                        $("#Delstartdatetimepicker").html(new Date(dataItem.c_start_date).toISOString().slice(0, 16));
+                        $("#Delenddatetimepicker").html(new Date(dataItem.c_end_date).toISOString().slice(0, 16));
+                        $("#DeltaskDescription").html(dataItem.c_description);
                     }
-                } *@
-            });
+                });
             },
             scrollable: true
         });
