@@ -12,7 +12,7 @@ namespace TaskTrackPro.API.Controllers
 {
     [ApiController]
     [Route("api/Admin")]
-    public class AdminController : Controller
+    public class AdminController : ControllerBase
     {
         private readonly IAdminQuery _adminQuery;
         private readonly IAdminCommand _adminCommand;

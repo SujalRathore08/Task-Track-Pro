@@ -12,3 +12,168 @@
     </ul>
 </section>
 <!--// Menu Section-->
+<!--// Main Section-->
+<div class="d-flex dashboard-wrapper justify-content-center align-items-center h100 mt-15 ">
+    <div class="dashboard-left   d-flex flex-column h100">
+        <div class="scrum-dataimport-header-block bg-light d-flex border mb-15">
+
+            <div class="searchbar w100 p-10 pb-5">
+                <div class="clear-input search-box w100">
+                    <input type="text" name="txtTagListSearch" id="txtTagListSearch" aria-label="tag name"
+                        class="form-control k-textbox k-valid" placeholder="Search Task here...">
+                    <i class="icon-search" aria-hidden="true"></i>
+                    <a role="button" id="btnTagListSearch" aria-label="Clear Search" href="javascript:void(0);"
+                        class="btn-icn-hover close icon-cancel" data-ara-title="Clear Search"></a>
+                </div>
+                <div class="action-div d-flex">
+                    <a href="javascript:void(0);" class="btn btn-raised btn-primary btn-block mr-5" role="button"
+                        aria-haspopup="true" aria-expanded="false" id="actionbtnmenu1"><i aria-hidden="true"
+                            class="icon-search"></i><span>Search</span></a>
+                </div>
+            </div>
+
+        </div>
+        <div class="flex-1 overflow-auto">
+            <div class="grid-wrapper h100 dataimport-grid">
+                <div id="Dataimportgrid"></div>
+                <div id="Dataimportgrid-pager" class="with-more-option"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+</div>
+<!-- option menu -->
+<ul id="popup" class="grid-options" style="display: none;">
+    <li class="goto">
+        <span class="text-muted">Go to page</span>
+        <span>
+            <input type="text" id="page_goto" class="form-control" />
+        </span>
+        <span class="text-muted">0</span>
+        <span class="text-muted">pages</span>
+    </li>
+    <li class="rpp">
+        <span class="text-muted">Record per page</span>
+        <select class="k-dropdown" id="pagerDropdown">
+            <option>5</option>
+            <option>10</option>
+            <option>15</option>
+            <option>20</option>
+            <option>50</option>
+            <option>100</option>
+            <option>200</option>
+        </select>
+    </li>
+</ul>
+
+
+<script>
+    // Grid
+
+
+    $("#Dataimportgrid").kendoGrid({
+        dataSource: fieldData,
+        totalRecordPerPage: 5,
+        scrollable: true,
+        resizable: false,
+        autoBind: true,
+
+        config: { CurrentPage: 0, TotalPage: 10, RecordPerPage: 10, TotalRecord: 100, searchText: "" },
+        columns: [
+            { selectable: true, width: "50px" },
+            { field: "datano", title: "No", width: "90px" },
+            { field: "dataid", title: "id", width: "135px" },
+            {
+                field: "datareq", title: "requirment/user story Title",
+                attributes: {
+                    "class": "white-space-normal",
+                }
+            },
+            { field: "dataTpl", title: "Tpl/Tl", width: "190px" },
+            { field: "dataAss", title: "Assigned to", width: "170px" },
+            { field: "dataVal", title: "value area (business Architectural)", width: "260px" },
+            { field: "dataInt", title: "iteration no", width: "200px" },
+        ]
+    }).data("kendoGrid");
+
+    $("#Dataimportgrid-pager").kendoPager({
+        dataSource: fieldData,
+        refresh: true
+    });
+    fieldData.read();
+
+    $("#Dataimportgrid-pager").append("<div class='more-oprion'><span class='separator'></span><a href='javascript:void(0)' id='moreOption' class='text-muted btn-default-hover'><i class='icon-option'></i></a></div>");
+
+    var popup = $("#popup").kendoPopup({
+        animation: false,
+        anchor: $("#moreOption"),
+        origin: "top right",
+        position: "bottom right",
+        collision: "fit",
+
+    }).data("kendoPopup");
+
+    $("#moreOption").click(function () {
+        $("#popup").data("kendoPopup").open()
+    });
+
+    $("#pagerDropdown").kendoDropDownList({
+        popup: {
+            appendTo: 'body'
+        }
+    });
+</script>
+
+
+<script>
+    $(document).ready(function () {
+        // Fetch Data from API
+        $.ajax({
+            url: "http://localhost:5136/api/Admin/users", // Adjust API URL if needed
+            type: "GET",
+            dataType: "json",
+            success: function (data) {
+                var formattedData = data.map((user, index) => ({
+                    datano: index + 1,            // Auto-increment No
+                    dataid: user.c_uid,           // User ID
+                    datareq: user.c_uname,        // Name
+                    dataTpl: user.c_email,        // Email
+                    dataAss: user.c_gender,       // Gender
+                    dataVal: user.c_profilepicture, // Profile Picture
+                    dataInt: "N/A"                // Placeholder for extra field
+                }));
+
+                // Initialize Kendo Grid
+                $("#Dataimportgrid").kendoGrid({
+                    dataSource: {
+                        data: formattedData,
+                        pageSize: 5
+                    },
+                    pageable: true,
+                    scrollable: true,
+                    resizable: false,
+                    autoBind: true,
+                    columns: [
+                        { selectable: true, width: "50px" },
+                        { field: "datano", title: "No", width: "90px" },
+                        { field: "dataid", title: "ID", width: "135px" },
+                        { field: "datareq", title: "Name", width: "200px" },
+                        { field: "dataTpl", title: "Email", width: "200px" },
+                        { field: "dataAss", title: "Gender", width: "120px" },
+                        {
+                            field: "dataVal", title: "Profile Picture", width: "150px",
+                            template: "<img src='/images/#: dataVal #' width='50' height='50' alt='Profile' />"
+                        },
+                        { field: "dataInt", title: "Iteration No", width: "150px" }
+                    ]
+                });
+            },
+            error: function () {
+                alert("Failed to fetch data.");
+            }
+        });
+    });
+</script>

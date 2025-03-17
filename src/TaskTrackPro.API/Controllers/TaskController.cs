@@ -46,13 +46,24 @@ namespace TaskTrackPro.API.Controllers
             var users = await _taskRepository.GetAllUsers();
             return Ok(users);
         }
-
-
+        [HttpGet("tasks")]
+        public async Task<IActionResult> GetAllTasks()
+        {
+            var users = await _taskRepository.GetAllTask();
+            return Ok(users);
+        }
         [HttpGet("approved-users")]
         public async Task<IActionResult> GetApprovedUsernames()
         {
-            var usernames = await _taskRepository.GetApprovedUsernames();
-            return Ok(usernames);
+            var users = await _taskRepository.GetApprovedUsernames();
+            return Ok(users);
+        }
+
+        [HttpGet("task")]
+        public async Task<IActionResult> GetTasksByid(int userId)
+        {
+            var users = await _taskRepository.GetTaskById(userId);
+            return Ok(users);
         }
 
 
