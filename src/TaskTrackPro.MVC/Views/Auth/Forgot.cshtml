@@ -1,0 +1,78 @@
+@{
+    Layout = "_AuthLayout";
+}
+<div class="login-bg-wrapper d-flex flex-column">
+    <div class="login-logo-header d-flex align-items-center">
+        <a href="#" class="login-logo-wrapper">
+            <img src="~/css/Default/images/TaskTrackPro.png" class="login-logo-img" alt="Clarent Institute" />
+        </a>
+        <span class="separator"></span>
+        <span class="login-branh-text">TaskTrackPro</span>
+    </div>
+    <div class="login-graphic-wrapper flex-1 overflow-auto d-flex flex-wrap">
+        <div class="login-left-wrapper">
+            <div>
+                <img src="~/css/Default/images/LogoImage.png" alt="Clarent Institute" class="login-graphice-img" />
+                <p class="login-graphice-text">Reset your password securely and regain access to your account.</p>
+            </div>
+        </div>
+        <div class="login-right-wrapper">
+            <div class="loginpage-box-wrapper">
+                <h2 class="login-title text-dark font-bold">Forgot Password</h2>
+                <div class="loginpage-box-content">
+                    <form id="forgotPasswordForm">
+                        <div class="form-group">
+                            <input type="email" class="k-textbox login-textbox" placeholder="Enter your email" id="forgotEmail" required>
+                            <span class="login-textbox-icon"><i class="icon-email"></i></span>
+                        </div>
+                        <div class="form-group pb-10">
+                            <button type="button" class="btn btn-primary k-button w100" id="sendOtp">Send OTP</button>
+                        </div>
+                        <div id="otpSection" style="display: none;">
+                            <div class="form-group">
+                                <input type="text" class="k-textbox login-textbox" placeholder="Enter OTP" id="otpInput">
+                                <span class="login-textbox-icon"><i class="icon-key"></i></span>
+                            </div>
+                            <div class="form-group pb-10">
+                                <button type="button" class="btn btn-primary k-button w100" id="verifyOtp">Verify OTP</button>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="text-center">
+                        <a asp-action="Login" class="forgot-pwd btn-link-trans font-medium text-dark text-primary">Back to Login</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('sendOtp').addEventListener('click', function () {
+        var email = document.getElementById('forgotEmail').value;
+                    alert('OTP sent to your email.');
+                    document.getElementById('otpSection').style.display = 'block';
+
+    });
+
+    document.getElementById('verifyOtp').addEventListener('click', function () {
+        var otp = document.getElementById('otpInput').value;
+        if (otp) {
+            fetch('/Account/VerifyOtp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ otp: otp })
+            }).then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('OTP Verified! Proceed to reset your password.');
+                    window.location.href = '/Account/ResetPassword';
+                } else {
+                    alert('Invalid OTP. Please try again.');
+                }
+            });
+        } else {
+            alert('Please enter the OTP.');
+        }
+    });
+</script>

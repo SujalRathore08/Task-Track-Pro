@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace TaskTrackPro.Core.Models
-{
+{ 
     public class t_task
     {
         [Key]

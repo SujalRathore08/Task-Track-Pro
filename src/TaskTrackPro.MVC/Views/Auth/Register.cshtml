@@ -1,0 +1,173 @@
+@{
+    Layout = "_AuthLayout";
+}
+
+<div class="login-bg-wrapper d-flex flex-column">
+    <div class="login-logo-header d-flex align-items-center bg-danger">
+        <a href="#" class="login-logo-wrapper"><img src="~/css/Default/images/LogoImage.png" class="login-logo-img"
+                alt="TaskTrackPro" /></a>
+        <span class="separator"></span>
+        <span class="login-branh-text">TaskTrackPro</span>
+    </div>
+    <div class="login-graphic-wrapper flex-1 overflow-auto d-flex flex-wrap">
+        <div class="login-left-wrapper">
+            <div>
+                <img src="~/css/Default/images/Login_Graphics.svg" alt="TaskTrackPro" class="login-graphice-img" />
+                <p class="login-graphice-text">A 360-degree Task Management Program For Your Organization.</p>
+            </div>
+        </div>
+        <div class="login-right-wrapper">
+            <div class="loginpage-box-wrapper">
+                <h2 class="login-title text-dark font-bold">Sign Up</h2>
+                <form class="loginpage-box-content" id="registerForm" method="post">
+                    <div class="form-group">
+                        <input type="text" class="k-textbox login-textbox" placeholder="User Name" id="registername"
+                            name="Username" required data-validation-message="Username is required.">
+                        <span class="login-textbox-icon"><i class="icon-user"></i></span>
+                        <span class="k-invalid-msg text-danger" data-for="registername"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" class="k-textbox login-textbox" placeholder="Email" id="registerEmail"
+                            name="Email" required data-validation-message="Please enter a valid email.">
+                        <span class="login-textbox-icon"><i class="icon-email"></i></span>
+                        <span class="k-invalid-msg text-danger" data-for="registerEmail"></span>
+                    </div>
+                    <div class="form-group">
+                        <select class="k-dropdown login-textbox border" name="Gender" id="Gender" required
+                            data-validation-message="Please select your gender.">
+                            <option selected disabled value="">Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                        <span class="login-textbox-icon"><i class="fa-solid fa-mars-and-venus"></i></span>
+                        <span class="k-invalid-msg text-danger" data-for="Gender"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" class="k-textbox login-textbox" placeholder="Password" id="registerpwd"
+                            name="Password" required
+                            data-validation-message="Password must be at least 6 characters, include uppercase, lowercase, digit, and special character.">
+                        <span class="login-textbox-icon"><i class="icon-locked"></i></span>
+                        <span class="k-invalid-msg text-danger" data-for="registerpwd"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" class="k-textbox login-textbox" placeholder="Confirm Password"
+                            id="registerConfirmpwd" name="Confirm Password" required
+                            data-validation-message="Passwords must match.">
+                        <span class="login-textbox-icon"><i class="icon-locked"></i></span>
+                        <span class="k-invalid-msg text-danger" data-for="registerConfirmpwd"></span>
+                    </div>
+
+                    <div class="form-group bt-1 pt-10">
+                        <label for="fileUploadasync" class="pointer-events-none">Upload Profile Image ( Optional
+                            )</label>
+                        <input name="files" class="files" type="file" aria-label="files" title="files"
+                            id="fileUpload" />
+                    </div>
+
+                    <div class="form-group pb-10">
+                        <button type="submit" class="btn btn-primary k-button w100 loginbtn">Sign Up</button>
+                    </div>
+                    <div class="text-center">
+                        <span class="text-dark font-medium">Have an account with us?</span>
+                        <a asp-action="Login" aria-label="Login"
+                            class="forgot-pwd btn-link-trans font-medium text-dark text-primary">Login here</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Kendo Validation Script -->
+<script>
+
+    $("#fileUploadasync").kendoUpload({
+        async: {
+            saveUrl: "save",
+            removeUrl: "remove",
+            autoUpload: true
+        }
+    });
+
+    $(document).ready(function () {
+        var validator = $("#registerForm").kendoValidator({
+            rules: {
+                strongPassword: function (input) {
+                    if (input.is("[name='Password']")) {
+                        var value = input.val();
+                        var passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])[A-Za-z\d\W_]{6,}$/;
+                        return passwordRegex.test(value);
+                    }
+                    return true;
+                },
+                confirmPassword: function (input) {
+                    if (input.is("[name='Confirm Password']")) {
+                        return input.val() === $("#registerpwd").val();
+                    }
+                    return true;
+                },
+                genderRequired: function (input) {
+                    if (input.is("[name='Gender']")) {
+                        return input.val() !== "";
+                    }
+                    return true;
+                }
+            },
+            messages: {
+                strongPassword: "Password must be at least 6 characters long, include one uppercase letter, one lowercase letter, one digit, and one special character.",
+                confirmPassword: "Passwords must match.",
+                genderRequired: "Please select your gender."
+            }
+        }).data("kendoValidator");
+
+        $("#registerForm").on("submit", function (e) {
+            if (!validator.validate()) {
+                e.preventDefault();
+            }
+        });
+    });
+</script>
+
+<!-- Register user Script -->
+<script>
+    $("#registerForm").on("submit", function (e) {
+        e.preventDefault();
+
+        var formData = new FormData();
+
+        var username = $("#registername").val();
+        var email = $("#registerEmail").val();
+        var gender = $("#Gender").val();
+        var password = $("#registerpwd").val();
+        // Append the image file
+        var fileInput = $('#fileUpload')[0]?.files[0];
+        if (fileInput) {
+            formData.append("c_profile", fileInput);
+        }
+
+        formData.append("c_uname", username);
+        formData.append("c_email", email);
+        formData.append("c_gender", gender);
+        formData.append("c_password", password);
+
+
+        $.ajax({
+            url: "http://localhost:5136/api/Account/Register",
+            type: "POST",
+            data: formData,
+            contentType: false,  // Important: Prevent jQuery from setting contentType
+            processData: false,  // Important: Prevent jQuery from processing the data
+            success: function (response) {
+                if (response.success) {
+                    alert(response.message); // Show success message
+                    window.location.href = "/Auth/Login"; // Redirect to login page
+                } else {
+                    alert(response.message); // Show error message
+                }
+            },
+            error: function (xhr) {
+                alert("Error: " + xhr.responseJSON?.message || "Registration failed.");
+            }
+        });
+    });
+</script>

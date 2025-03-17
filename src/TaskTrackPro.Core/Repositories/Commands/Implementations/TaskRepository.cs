@@ -66,7 +66,7 @@ namespace TaskTrackPro.Core.Repositories.Commands.Implementations
                         c_email = reader.GetString(2),
                         c_gender = reader.GetString(4),
                         // c_profilepicture = reader.GetString(6)
-                        c_profilepicture = reader.IsDBNull(5) ? "default.png" : reader.GetString(5),
+                        // c_profilepicture = reader.IsDBNull(5) ? "default.png" : reader.GetString(5),
                     });
                 }
             }
@@ -187,6 +187,75 @@ namespace TaskTrackPro.Core.Repositories.Commands.Implementations
                 Console.WriteLine($"Error: {ex.Message}");
                 return 0;
             }
+        }
+
+        public async Task<List<t_task>> GetAllTask()
+        {
+            var tasks = new List<t_task>();
+
+            try
+            {
+                await using var conn = new NpgsqlConnection(_connectionString);
+                await conn.OpenAsync();
+
+                await using var cmd = new NpgsqlCommand("SELECT * FROM t_task", conn);
+                await using var reader = await cmd.ExecuteReaderAsync();
+
+                while (await reader.ReadAsync())
+                {
+                    tasks.Add(new t_task
+                    {
+                        c_tid = reader.GetInt32(0),
+                        c_uid = reader.GetInt32(1),
+                        c_task_title = reader.GetString(2),
+                        c_description = reader.GetString(3),
+                        c_start_date = reader.GetDateTime(4),
+                        c_end_date = reader.GetDateTime(5),
+                        c_task_status = reader.GetString(6)
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
+
+            return tasks;
+        }
+
+        public async Task<List<t_task>> GetTaskById(int userId)
+        {
+            var tasks = new List<t_task>();
+
+            try
+            {
+                await using var conn = new NpgsqlConnection(_connectionString);
+                await conn.OpenAsync();
+
+                await using var cmd = new NpgsqlCommand("SELECT * FROM t_task where c_uid = @c_uid", conn);
+                cmd.Parameters.AddWithValue("@c_uid", userId);
+                await using var reader = await cmd.ExecuteReaderAsync();
+
+                while (await reader.ReadAsync())
+                {
+                    tasks.Add(new t_task
+                    {
+                        c_tid = reader.GetInt32(0),
+                        c_uid = reader.GetInt32(1),
+                        c_task_title = reader.GetString(2),
+                        c_description = reader.GetString(3),
+                        c_start_date = reader.GetDateTime(4),
+                        c_end_date = reader.GetDateTime(5),
+                        c_task_status = reader.GetString(6)
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
+
+            return tasks;
         }
 
     }

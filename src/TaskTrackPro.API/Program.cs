@@ -1,24 +1,28 @@
 using Npgsql;
-
+using StackExchange.Redis;
+using TaskTrackPro.API.Controllers;
 using TaskTrackPro.Core.Repositories.Commands.Implementations;
 using TaskTrackPro.Core.Repositories.Commands.Interfaces;
 using TaskTrackPro.Core.Repositories.Queries.Implementations;
 using TaskTrackPro.Core.Repositories.Queries.Interfaces;
-
-
+using TaskTrackPro.Core.Services.Messaging;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Caching.StackExchangeRedis;
+using TaskTrackPro.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ✅ Add CORS Policy
+// ✅ Configure CORS Policy (Ensures cross-origin access for frontend)
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAllOrigins",
-        policy =>
-        {
-            policy.AllowAnyOrigin() // Allows requests from any frontend (Avoid in production)
-                  .AllowAnyMethod() // Allows GET, POST, PUT, DELETE, etc.
-                  .AllowAnyHeader(); // Allows all headers
-        });
+    options.AddPolicy("corsapp", policy =>
+    {
+        policy.WithOrigins("http://localhost:5122", "http://localhost:5285") // Frontend URLs
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
+    });
 });
 
 // ✅ Configure PostgreSQL connection
@@ -27,30 +31,51 @@ builder.Services.AddScoped<NpgsqlConnection>(_ => new NpgsqlConnection(connectio
 builder.Services.AddScoped<ITaskInterface, TaskRepository>();
 builder.Services.AddScoped<IAdminQuery, AdminQuery>();
 builder.Services.AddScoped<IAdminCommand, AdminCommand>();
+builder.Services.AddScoped<IAccountCommand, AccountCommand>();
+builder.Services.AddScoped<ChatService>();
 
-// ✅ Add services for Controllers & API
+// ✅ Configure Redis Connection
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+{
+    var configuration = ConfigurationOptions.Parse(builder.Configuration["Redis:ConnectionString"] ?? "127.0.0.1:6379");
+    return ConnectionMultiplexer.Connect(configuration);
+});
+builder.Services.AddSingleton<IDatabase>(sp =>
+{
+    var multiplexer = sp.GetRequiredService<IConnectionMultiplexer>();
+    return multiplexer.GetDatabase();
+});
+
+// ✅ Register Custom Redis Services
+builder.Services.AddSingleton<RedisService>();
+builder.Services.AddSingleton<CacheStringsStack>();
+
+// ✅ Configure Redis Caching
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration["Redis:ConnectionString"] ?? "localhost:6379";
+    options.InstanceName = "Session_"; // Prefix for session keys
+});
+
+// ✅ Configure Session Storage
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+// ✅ Register API Services
 builder.Services.AddControllers();
+builder.Services.AddSignalR();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddControllers();
-
-// Configuring cors 
-builder.Services.AddCors(p => p.AddPolicy("corsapp", builder =>
-{
-    builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
-}));
-
-// Configuring connection string
-builder.Services.AddSingleton<NpgsqlConnection>((ServiceProvider) =>
-{
-    var connection = ServiceProvider.GetRequiredService<IConfiguration>().GetConnectionString("pgconnection");
-    return new NpgsqlConnection(connection);
-});
+builder.Services.AddDistributedMemoryCache(); // For in-memory session storage
 
 var app = builder.Build();
 
 // ✅ Use CORS Middleware (Must be before `UseAuthorization`)
-app.UseCors("AllowAllOrigins");
+app.UseCors("corsapp");
 
 // ✅ Configure Swagger for API documentation
 if (app.Environment.IsDevelopment())
@@ -59,12 +84,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-
-app.UseCors("corsapp");
-
 app.UseHttpsRedirection();
-app.UseAuthorization();  // Handles authentication & authorization
+app.UseSession(); // Enables session middleware
+app.UseAuthorization(); // Handles authentication & authorization
 
-app.MapControllers(); // ✅ This replaces `UseRouting()` and `UseEndpoints()`
+app.MapControllers();
+app.MapHub<ChatHub>("/chathub");
 
 app.Run();
