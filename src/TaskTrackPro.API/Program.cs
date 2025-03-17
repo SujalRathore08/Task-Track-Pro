@@ -77,16 +77,16 @@ builder.Services.AddDistributedMemoryCache(); // For in-memory session storage
 
 builder.Services.AddSingleton(provider =>
 {
-    var configuration = builder.Configuration;
-    var settings = new ElasticsearchClientSettings(new
-    Uri(configuration["Elasticsearch:Uri"]))
-    .ServerCertificateValidationCallback(CertificateValidations.AllowAll)
-    .DefaultIndex(configuration["Elasticsearch:DefaultIndex"])
-    .Authentication(new
-    BasicAuthentication(configuration["Elasticsearch:Username"],
-    configuration["Elasticsearch:Password"]))
-    .DisableDirectStreaming();
-    return new ElasticsearchClient(settings);
+var configuration = builder.Configuration;
+var settings = new ElasticsearchClientSettings(new
+Uri(configuration["Elasticsearch:Uri"]))
+.ServerCertificateValidationCallback(CertificateValidations.AllowAll)
+.DefaultIndex(configuration["Elasticsearch:DefaultIndex"])
+.Authentication(new
+BasicAuthentication(configuration["Elasticsearch:Username"],
+configuration["Elasticsearch:Password"]))
+.DisableDirectStreaming();
+return new ElasticsearchClient(settings);
 });
 
 

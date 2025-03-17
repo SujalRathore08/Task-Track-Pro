@@ -23,16 +23,16 @@
 
                         <div class="searchbar w100 p-10 pb-5">
                             <div class="clear-input search-box w100">
-                                <input type="text" name="txtTagListSearch" id="txtTagListSearch" aria-label="tag name"
+                                <input type="text" name="txtTagListSearch" id="TaskElaticInput" aria-label="tag name"
                                     class="form-control k-textbox k-valid" placeholder="Search Task here...">
                                 <i class="icon-search" aria-hidden="true"></i>
-                                <a role="button" id="btnTagListSearch" aria-label="Clear Search"
+                                <a role="button" id="ElasticClear" aria-label="Clear Search"
                                     href="javascript:void(0);" class="btn-icn-hover close icon-cancel"
                                     data-ara-title="Clear Search"></a>
                             </div>
                             <div class="action-div d-flex">
                                 <a href="javascript:void(0);" class="btn btn-raised btn-primary btn-block mr-5"
-                                    role="button" aria-haspopup="true" aria-expanded="false" id="actionbtnmenu1"><i
+                                    role="button" aria-haspopup="true" aria-expanded="false"  id="TaskElaticSearch"><i
                                         aria-hidden="true" class="icon-search"></i><span>Search</span></a>
 
 
@@ -315,7 +315,7 @@
                     let usersDropdown = $("#usersList");
                     let usersDropdown2 = $("#UpdateusersList");
                     users.forEach(user => {
-                        let option = `<option value="${user.c_uid}">${user.c_uname}</option>`;
+                        let option = <option value="${user.c_uid}">${user.c_uname}</option>;
                         usersDropdown.append(option);
                         usersDropdown2.append(option);
                     });
@@ -386,11 +386,125 @@
 
 <script>
     $(document).ready(function () {
-        // Fetch Data from API
+        LoadGridData()
+        $('#ElasticClear').click(function(){
+            window.location.reload()
+        })
+
+        function LoadGridData()
+        {
+            // Fetch Data from API
+            var taskDataSource = new kendo.data.DataSource({
+                transport: {
+                    read: {
+                        url: "http://localhost:5136/api/task/tasks",
+                        dataType: "json"
+                    }
+                },
+                pageSize: 5,
+                schema: {
+                    model: {
+                        id: "c_tid",
+                        fields: {
+                            c_tid: { type: "number" },
+                            c_uid: { type: "number" },
+                            c_task_title: { type: "string" },
+                            c_description: { type: "string" },
+                            c_start_date: { type: "date" },
+                            c_end_date: { type: "date" },
+                            c_task_status: { type: "string" }
+                        }
+                    }
+                }
+            });
+
+            // Initialize Kendo Grid
+            $("#taskGrid").kendoGrid({
+                dataSource: taskDataSource,
+                height: 400,
+                pageable: {
+                    refresh: true,
+                    pageSizes: [5, 10, 20],
+                    buttonCount: 3
+                },
+                sortable: true,
+                filterable: true,
+                resizable: true,
+                columns: [
+                    { field: "c_tid", title: "Task ID", width: 80 },
+                    { field: "c_uid", title: "User ID", width: 80 },
+                    { field: "c_task_title", title: "Task Title", width: 150 },
+                    { field: "c_description", title: "Description", width: 200 },
+                    {
+                        field: "c_start_date",
+                        title: "Start Date",
+                        width: 120,
+                        format: "{0:yyyy-MM-dd}"
+                    },
+                    {
+                        field: "c_end_date",
+                        title: "End Date",
+                        width: 120,
+                        format: "{0:yyyy-MM-dd}"
+                    },
+                    { field: "c_task_status", title: "Status", width: 100 },
+                    {
+                        title: "Actions",
+                        template: "<button class='btn-edit-task btn btn-warning btn-sm'><i class='icon-edit'></i></button> <button class='btn-delete-task btn btn-danger btn-sm'><i class='icon-delete'></i></button>",
+                        width: 120
+                    }
+                ],
+                dataBound: function () {
+                    $(".btn-edit-task").click(function () {
+                        var grid = $("#taskGrid").data("kendoGrid");
+                        var row = $(this).closest("tr");
+                        var dataItem = grid.dataItem(row);
+
+                        if (dataItem) {
+                            $("#taskId").val(dataItem.c_tid);
+                            $("#UpdateTaskTitle").val(dataItem.c_task_title);
+                            $("#UpdateusersList").val(dataItem.c_uid);
+                            $("#Updatestartdatetimepicker").val(new Date(dataItem.c_start_date).toISOString().slice(0, 16));
+                            $("#Updateenddatetimepicker").val(new Date(dataItem.c_end_date).toISOString().slice(0, 16));
+                            $("#UpdatetaskDescription").val(dataItem.c_description);
+                        }
+                    });
+
+                    $(".btn-delete-task").click(function () {
+                        var grid = $("#taskGrid").data("kendoGrid");
+                        var row = $(this).closest("tr");
+                        var dataItem = grid.dataItem(row);
+
+                        if (dataItem) {
+                            $("#DeltaskId").val(dataItem.c_tid);
+                            $("#DelTaskTitle").html(dataItem.c_task_title);
+                            $("#DelusersList").html(dataItem.c_uid);
+                            $("#Delstartdatetimepicker").html(new Date(dataItem.c_start_date).toISOString().slice(0, 16));
+                            $("#Delenddatetimepicker").html(new Date(dataItem.c_end_date).toISOString().slice(0, 16));
+                            $("#DeltaskDescription").html(dataItem.c_description);
+                        }
+                    });
+                },
+                scrollable: true
+            });
+
+            // Initialize Pager
+            $("#taskPager").kendoPager({
+                dataSource: taskDataSource
+            });
+        }
+    });
+
+</script>
+
+<script>
+    $("#TaskElaticSearch").click(function (){
+        var searchWord = $('#TaskElaticInput').val()
+         // Fetch Data from API
         var taskDataSource = new kendo.data.DataSource({
             transport: {
                 read: {
-                    url: "http://localhost:5136/api/task/tasks",
+                    url: "http://localhost:5136/api/Admin/"+searchWord,
                     dataType: "json"
                 }
             },
@@ -485,8 +599,5 @@
         $("#taskPager").kendoPager({
             dataSource: taskDataSource
         });
-    });
-
+    })
 </script>
-
-

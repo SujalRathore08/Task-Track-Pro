@@ -23,7 +23,7 @@ namespace TaskTrackPro.API.Controllers
         private readonly ElasticsearchServices _elasticssearchServices;
         private readonly ITaskInterface _taskInterface;
 
-        public AdminController(IAdminQuery adminQuery,ElasticsearchServices elasticssearchServices, IAdminCommand adminCommand, ITaskInterface taskInterface)
+        public AdminController(IAdminQuery adminQuery, ElasticsearchServices elasticssearchServices, IAdminCommand adminCommand, ITaskInterface taskInterface)
         {
             _adminQuery = adminQuery;
             _adminCommand = _adminCommand;
@@ -42,8 +42,9 @@ namespace TaskTrackPro.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllTasks(){
-            string c_uid ="";
+        public async Task<IActionResult> GetAllTasks()
+        {
+            string c_uid = "";
             List<t_task> list;
             if (c_uid == "")
             {

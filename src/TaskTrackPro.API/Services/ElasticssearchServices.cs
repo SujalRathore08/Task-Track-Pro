@@ -19,9 +19,6 @@ namespace TaskTrackPro.API.Services
             _client = client;
         }
 
-        /// <summary>
-        /// Creates the index with the correct mapping for wildcard search.
-        /// </summary>
         public async Task<int> CreateIndexAsync()
         {
             var indexExistsResponse = await _client.Indices.ExistsAsync(_indexName);
@@ -54,9 +51,7 @@ namespace TaskTrackPro.API.Services
             }
         }
 
-        /// <summary>
-        /// Indexes a new task document into Elasticsearch.
-        /// </summary>
+
         public async Task IndexTaskAsync(t_task task)
         {
             var response = await _client.IndexAsync(task, idx => idx.Index(_indexName));
@@ -70,16 +65,13 @@ namespace TaskTrackPro.API.Services
             }
         }
 
-        /// <summary>
-        /// Searches for tasks based on a wildcard match in the task title.
-        /// </summary>
-        public async Task<List<t_task>> SearchTaskByTitleAsync(string name)
+        public async Task<List<t_task?>> SearchTaskByTitleAsync(string name)
         {
             var response = await _client.SearchAsync<t_task>(s => s
                 .Index(_indexName)
                 .Query(q => q.Wildcard(w => w
                     .Field(f => f.c_task_title) // Use the text field for wildcard search
-                    .Value($"{name}")
+                    .Value($"*{name}*")
                     .CaseInsensitive(true) // Ensure case insensitivity
                 ))
             );
