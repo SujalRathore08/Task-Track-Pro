@@ -489,22 +489,4 @@
 
 </script>
 
-<script>
-    document.getElementById('actionbtnmenu1').addEventListener('click', function () {
-        let searchValue = document.getElementById('txtTagListSearch').value.trim();
-        if (searchValue) {
-            fetch(`http://localhost:5136/api/Admin/${encodeURIComponent(searchValue)}`)
-                .then(response => response.json())
-                .then(data => console.log(data)) // Handle API response
-                .catch(error => console.error('Error:', error));
-        } else {
-            alert("Please enter a search term.");
-        }
-    });
-
-    // Clear input field on clicking the clear button
-    document.getElementById('btnTagListSearch').addEventListener('click', function () {
-        document.getElementById('txtTagListSearch').value = "";
-    });
-</script>
 

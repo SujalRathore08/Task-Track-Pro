@@ -20,10 +20,10 @@ namespace TaskTrackPro.API.Controllers
         private readonly IAdminQuery _adminQuery;
         private readonly IAdminCommand _adminCommand;
 
-        private readonly ElasticssearchServices _elasticssearchServices;
+        private readonly ElasticsearchServices _elasticssearchServices;
         private readonly ITaskInterface _taskInterface;
 
-        public AdminController(IAdminQuery adminQuery,ElasticssearchServices elasticssearchServices, IAdminCommand adminCommand, ITaskInterface taskInterface)
+        public AdminController(IAdminQuery adminQuery,ElasticsearchServices elasticssearchServices, IAdminCommand adminCommand, ITaskInterface taskInterface)
         {
             _adminQuery = adminQuery;
             _adminCommand = _adminCommand;
@@ -34,8 +34,11 @@ namespace TaskTrackPro.API.Controllers
         [HttpGet("{name}")]
         public async Task<IActionResult> SearchTask(string name)
         {
-            var task = await _elasticssearchServices.SearchContactNameAsync(name);
-            return Ok(task);
+            var task = await _elasticssearchServices.SearchTaskByTitleAsync(name);
+            // Remove duplicates based on a unique property, assuming "Id" is unique
+            var uniqueTasks = task.DistinctBy(t => t.c_tid).ToList();
+
+            return Ok(uniqueTasks);
         }
 
         [HttpGet]

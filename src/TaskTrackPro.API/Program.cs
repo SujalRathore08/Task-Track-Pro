@@ -35,7 +35,7 @@ builder.Services.AddScoped<IAdminQuery, AdminQuery>();
 builder.Services.AddScoped<IAdminCommand, AdminCommand>();
 builder.Services.AddScoped<IAccountCommand, AccountCommand>();
 builder.Services.AddScoped<ChatService>();
-builder.Services.AddSingleton<ElasticssearchServices>();
+builder.Services.AddSingleton<ElasticsearchServices>();
 
 // ✅ Configure Redis Connection
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
@@ -95,7 +95,7 @@ var app = builder.Build();
 async Task IndexDataOnStartup(){
     using var scope = app.Services.CreateScope();
     var contactRepo = scope.ServiceProvider.GetRequiredService<ITaskInterface>();
-    var elasticService = scope.ServiceProvider.GetRequiredService<ElasticssearchServices>();    
+    var elasticService = scope.ServiceProvider.GetRequiredService<ElasticsearchServices>();    
 
     try{
         await elasticService.CreateIndexAsync();
@@ -117,7 +117,7 @@ async Task IndexDataOnStartup(){
 await IndexDataOnStartup();
 
 
-// ✅ Use CORS Middleware (Must be before `UseAuthorization`)
+// ✅ Use CORS Middleware (Must be before UseAuthorization)
 app.UseCors("corsapp");
 
 // ✅ Configure Swagger for API documentation
