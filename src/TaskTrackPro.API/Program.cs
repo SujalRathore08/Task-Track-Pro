@@ -9,15 +9,19 @@ using TaskTrackPro.Core.Services.Messaging;
 using TaskTrackPro.API.Services;
 using Elastic.Transport;
 using Elastic.Clients.Elasticsearch;
+using TaskTrackPro.API.Consumers;
+using RabbitMQ.Client;
+using TaskTrackPro.Core.Services.Email;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // ✅ Configure CORS Policy (Ensures cross-origin access for frontend)
+// ✅ Configure CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("corsapp", policy =>
     {
-        policy.WithOrigins("http://localhost:5122", "http://localhost:5285") // Frontend URLs
+        policy.WithOrigins("http://localhost:3000", "http://localhost:5136", "http://localhost:5285")
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials();
@@ -31,10 +35,16 @@ builder.Services.AddScoped<ITaskInterface, TaskRepository>();
 builder.Services.AddScoped<IAdminQuery, AdminQuery>();
 builder.Services.AddScoped<IAdminCommand, AdminCommand>();
 builder.Services.AddScoped<IAccountCommand, AccountCommand>();
+builder.Services.AddScoped<IUserInterface, UserRepository>();
 builder.Services.AddScoped<ITaskCount, TaskCountRepository>();
 builder.Services.AddScoped<ChatService>();
 builder.Services.AddSingleton<ElasticsearchServices>();
 builder.Services.AddSingleton<ElasticsearchService>();
+builder.Services.AddSingleton<RabbitMqPublisher>();
+builder.Services.AddSingleton<RedisServices>();
+builder.Services.AddSingleton<RabbitMqConsumer>();
+// ✅ Register RabbitMQ Consumer
+builder.Services.AddSingleton<UserRegistrationConsumer>();
 
 // ✅ Configure Redis Connection
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
@@ -86,6 +96,19 @@ builder.Services.AddSingleton(provider =>
     configuration["Elasticsearch:Password"]))
     .DisableDirectStreaming();
     return new ElasticsearchClient(settings);
+});
+
+// ✅ Configure RabbitMQ
+builder.Services.AddSingleton<IConnection>(sp =>
+{
+    var factory = new ConnectionFactory
+    {
+        HostName = "localhost",
+        Port = 5672,
+        UserName = "guest",
+        Password = "guest"
+    };
+    return factory.CreateConnection();
 });
 
 
@@ -148,11 +171,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// ✅ Start RabbitMQ Consumer
+var consumer = app.Services.GetRequiredService<UserRegistrationConsumer>();
+Task.Run(() => consumer.StartListening());
+
 app.UseHttpsRedirection();
 app.UseSession(); // Enables session middleware
 app.UseAuthorization(); // Handles authentication & authorization
 
 app.MapControllers();
 app.MapHub<ChatHub>("/chathub");
-
 app.Run();

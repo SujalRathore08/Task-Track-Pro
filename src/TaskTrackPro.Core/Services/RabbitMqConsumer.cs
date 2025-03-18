@@ -1,73 +1,85 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using StackExchange.Redis;
+using TaskTrackPro.API.Services;
 
-namespace TaskTrackPro.Core.Services
+namespace TaskTrackPro.API.Consumers
 {
     public class RabbitMqConsumer
     {
-        private readonly IDatabase _redis;
-        private readonly ConnectionFactory _factory;
         private readonly string _queueName = "taskQueue";
+        private readonly ConnectionFactory _factory;
+        private readonly IServiceProvider _serviceProvider;
 
-        public RabbitMqConsumer()
+        public RabbitMqConsumer(IServiceProvider serviceProvider)
         {
-            // ✅ Connect to Redis
-            _redis = ConnectionMultiplexer.Connect("localhost").GetDatabase();
-
-            // ✅ RabbitMQ Connection
-            _factory = new ConnectionFactory()
-            {
-                HostName = "localhost",
-                Port = 5672,
-                UserName = "guest",
-                Password = "guest"
-            };
+            _factory = new ConnectionFactory() { HostName = "localhost", DispatchConsumersAsync = true };
+            _serviceProvider = serviceProvider;
+            Task.Run(() => StartListening());
         }
 
-        public void ConsumeNotifications()
+        private async void StartListening()
         {
             using var connection = _factory.CreateConnection();
             using var channel = connection.CreateModel();
+            channel.QueueDeclare(_queueName, false, false, false, null);
+            channel.BasicQos(0, 1, false);
 
-            // ✅ Declare queue to ensure it exists
-            channel.QueueDeclare(queue: _queueName,
-                                 durable: true,
-                                 exclusive: false,
-                                 autoDelete: false,
-                                 arguments: null);
+            Console.WriteLine("[✔] RabbitMQ Consumer Started - Listening for notifications...");
 
-            var consumer = new EventingBasicConsumer(channel);
+            var consumer = new AsyncEventingBasicConsumer(channel);
             consumer.Received += async (model, ea) =>
             {
-                var body = ea.Body.ToArray();
-                var message = Encoding.UTF8.GetString(body);
-                var notification = JsonSerializer.Deserialize<TaskNotification>(message);
+                var message = Encoding.UTF8.GetString(ea.Body.ToArray());
+                var notification = JsonSerializer.Deserialize<NotificationMessage>(message);
+                Console.WriteLine($"[✔] Received Notification: {notification.NotificationTitle} for User {notification.UserId}");
 
-                Console.WriteLine($"[RabbitMQ] Received Notification: {notification.NotificationTitle} for User {notification.UserId}");
+                try
+                {
+                    using var scope = _serviceProvider.CreateScope();
+                    var redisService = scope.ServiceProvider.GetRequiredService<RedisServices>();
+                    var existingNotifications = await redisService.GetNotificationsAsync(notification.UserId);
 
-                // ✅ Store notification in Redis
-                await _redis.ListRightPushAsync($"notifications:{notification.UserId}", notification.NotificationTitle);
-                Console.WriteLine($"[Redis] Stored notification for User {notification.UserId}");
-
-                // ✅ Acknowledge message
-                channel.BasicAck(ea.DeliveryTag, false);
+                    // Only store if it's not already in Redis
+                    if (!existingNotifications.Contains(notification.NotificationTitle))
+                    {
+                        await redisService.StoreNotificationAsync(notification.UserId, notification.NotificationTitle);
+                        Console.WriteLine($"[✔] Stored in Redis for User {notification.UserId}");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"[⚠] Notification already exists in Redis: {notification.NotificationTitle}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[❌] Error processing message: {ex.Message}");
+                }
+                finally
+                {
+                    channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
+                }
             };
 
-            channel.BasicConsume(queue: _queueName, autoAck: false, consumer: consumer);
-            Console.WriteLine("[RabbitMQ] Consumer started. Listening for messages...");
+            channel.BasicConsume(_queueName, false, consumer);
+            await Task.Delay(-1);
+        }
 
-            // ✅ Keep the consumer running
-            while (true) { }
+        public async Task<List<string>> GetNotificationsByUser(string userId)
+        {
+            using var scope = _serviceProvider.CreateScope();
+            var redisService = scope.ServiceProvider.GetRequiredService<RedisServices>();
+            var redisNotifications = await redisService.GetNotificationsAsync(userId);
+            return redisNotifications ?? new List<string>();
         }
     }
-    public class TaskNotification
+
+    public class NotificationMessage
     {
         public string UserId { get; set; }
         public string NotificationTitle { get; set; }

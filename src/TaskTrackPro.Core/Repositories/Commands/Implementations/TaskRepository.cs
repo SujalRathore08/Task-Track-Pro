@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Npgsql;
+using TaskTrackPro.API.Services;
 using TaskTrackPro.Core.Models;
 using TaskTrackPro.Core.Repositories.Commands.Interfaces;
 using TaskTrackPro.Core.Services;
@@ -10,10 +11,14 @@ namespace TaskTrackPro.Core.Repositories.Commands.Implementations
     public class TaskRepository : ITaskInterface
     {
         private readonly string _connectionString;
+        private readonly RedisServices _redisService;
+        private readonly RabbitMqPublisher _rabbitMqPublisher;
 
-        public TaskRepository(NpgsqlConnection connection)
+        public TaskRepository(NpgsqlConnection connection, RedisServices redisService, RabbitMqPublisher rabbitMqPublisher)
         {
             _connectionString = connection.ConnectionString;
+            _redisService = redisService;
+            _rabbitMqPublisher = rabbitMqPublisher;
         }
 
         public async Task<int> Add(t_task data)
@@ -23,11 +28,12 @@ namespace TaskTrackPro.Core.Repositories.Commands.Implementations
                 await using var conn = new NpgsqlConnection(_connectionString);
                 await conn.OpenAsync();
 
-                await using var cm = new NpgsqlCommand(@"
-                    INSERT INTO t_task (c_uid, c_task_title, c_description, c_start_date, c_end_date, c_task_status) 
-                    VALUES (@c_uid, @c_task_title, @c_description, @c_start_date, @c_end_date, @c_task_status)
-                    RETURNING c_tid;", conn);
+                string insertQuery = @"
+                INSERT INTO t_task (c_uid, c_task_title, c_description, c_start_date, c_end_date, c_task_status) 
+                VALUES (@c_uid, @c_task_title, @c_description, @c_start_date, @c_end_date, @c_task_status)
+                RETURNING c_tid;";
 
+                await using var cm = new NpgsqlCommand(insertQuery, conn);
                 cm.Parameters.AddWithValue("@c_uid", data.c_uid);
                 cm.Parameters.AddWithValue("@c_task_title", data.c_task_title);
                 cm.Parameters.AddWithValue("@c_description", data.c_description);
@@ -36,8 +42,33 @@ namespace TaskTrackPro.Core.Repositories.Commands.Implementations
                 cm.Parameters.AddWithValue("@c_task_status", data.c_task_status);
 
                 var insertedId = await cm.ExecuteScalarAsync();
+                int taskId = insertedId != null ? Convert.ToInt32(insertedId) : 0;
 
-                return insertedId != null ? Convert.ToInt32(insertedId) : 0;
+                if (taskId > 0)
+                {
+                    string notification = $"New Task Assigned: {data.c_task_title}";
+
+                    // ✅ Ensure RedisService & RabbitMqPublisher are injected before using
+                    if (_redisService != null)
+                    {
+                        await _redisService.StoreNotificationAsync(data.c_uid.ToString(), notification);
+                    }
+                    else
+                    {
+                        Console.WriteLine("[⚠] RedisService is not initialized!");
+                    }
+
+                    if (_rabbitMqPublisher != null)
+                    {
+                        _rabbitMqPublisher.PublishNotification(data.c_uid.ToString(), notification);
+                    }
+                    else
+                    {
+                        Console.WriteLine("[⚠] RabbitMqPublisher is not initialized!");
+                    }
+                }
+
+                return taskId;
             }
             catch (Exception ex)
             {
@@ -45,7 +76,6 @@ namespace TaskTrackPro.Core.Repositories.Commands.Implementations
                 return 0;
             }
         }
-
         public async Task<List<t_User>> GetAllUsers()
         {
             var users = new List<t_User>();

@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using TaskTrackPro.API.Consumers;
+using TaskTrackPro.API.Services;
 using TaskTrackPro.Core.Models;
 using TaskTrackPro.Core.Repositories.Commands.Interfaces;
 
@@ -12,10 +14,14 @@ namespace TaskTrackPro.API.Controllers
     public class TaskController : ControllerBase
     {
         private readonly ITaskInterface _taskRepository;
+        private readonly RedisServices _redisService;
+        private readonly RabbitMqConsumer _rabbitMqConsumer;
 
-        public TaskController(ITaskInterface taskRepository)
+        public TaskController(ITaskInterface taskRepository, RedisServices redisService, RabbitMqConsumer rabbitMqConsumer)
         {
             _taskRepository = taskRepository;
+            _redisService = redisService;
+            _rabbitMqConsumer = rabbitMqConsumer;
         }
 
         // POST: api/task/add
@@ -39,6 +45,28 @@ namespace TaskTrackPro.API.Controllers
             }
         }
 
+        [HttpGet("notifications/{userId}")]
+        public async Task<IActionResult> GetNotifications(string userId)
+        {
+            using var scope = HttpContext.RequestServices.CreateScope();
+            var redisService = scope.ServiceProvider.GetRequiredService<RedisService>();
+
+            var notifications = await _redisService.GetNotificationsAsync(userId);
+
+            if (notifications == null || notifications.Count == 0)
+            {
+                return Ok(new List<object>()); // ✅ Return empty array instead of NoContent()
+            }
+
+            return Ok(notifications);
+        }
+
+        [HttpDelete("notifications/clear/{userId}")]
+        public async Task<IActionResult> ClearNotifications(string userId)
+        {
+            await _redisService.ClearNotificationsAsync(userId);
+            return Ok("Notifications cleared successfully.");
+        }
 
         [HttpGet("users")]
         public async Task<IActionResult> GetAllUsers()
@@ -120,6 +148,13 @@ namespace TaskTrackPro.API.Controllers
             {
                 return NotFound("Task not found or delete failed.");
             }
+        }
+
+        [HttpGet("notifications/count/{userId}")]
+        public async Task<IActionResult> GetNotificationCount(string userId)
+        {
+            var count = await _redisService.CountNotificationsAsync(userId);
+            return Ok(new { notificationCount = count });
         }
 
     }

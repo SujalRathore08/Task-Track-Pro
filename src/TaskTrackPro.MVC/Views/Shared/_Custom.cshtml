@@ -42,7 +42,7 @@
     <header class="main-header">
         <nav class="mt-navbar">
             <div class="nav-left" id="dvLeftMenu" data-role="aratooltipv2">
-                <div  class="logo-wrapper">
+                <div class="logo-wrapper">
                     <img style="width: 100%;" src="~/css/Default/images/LogoImage.png" />
                 </div>
                 <ul class="left-menu list-unstyled list-inline">
@@ -59,9 +59,9 @@
 
                     </li>
                     <li class="notification-item notification item">
-                        <a href="#offcanvasExample" data-bs-toggle="offcanvas" aria-controls="offcanvasExample">
+                        <a href="#offcanvasExample" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNotifications" aria-controls="offcanvasNotifications">
                             <span class="icon"><i class="icon-notification"></i></span>
-                            <span style="box-shadow: 0px 0px 10px rgb(255, 255, 255);" class="counts">12</span>
+                            <span id="NotificationCount" style="box-shadow: 0px 0px 10px rgb(255, 255, 255);" class="counts">12</span>
                         </a>
                     </li>
                     <li class="separator"></li>
@@ -78,55 +78,16 @@
     <!--// Navigation Header-->
 
     <!--// Notification Offcanvas start-->
-    <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNotifications" aria-labelledby="offcanvasLabel">
         <div class="offcanvas-header">
-            <h3 class="offcanvas-title" id="offcanvasExampleLabel">Notifications</h3>
+            <h3 class="offcanvas-title" id="offcanvasLabel">Notifications</h3>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body">
-             <div class="accordion" id="notificationAccordion">
-                <!-- Unread Notifications -->
-                <h4 class="text-danger">Unread Notifications</h4>
-                <div class="accordion-item notification unread" id="notif-1">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1">
-                            🔔 New Message from John
-                        </button>
-                    </h2>
-                    <div id="collapse1" class="accordion-collapse collapse" data-bs-parent="#notificationAccordion">
-                        <div class="accordion-body">
-                            John sent you a message: "Hey, are we still on for the meeting at 3 PM?"
-                        </div>
-                    </div>
-                </div>
-                <div class="accordion-item notification unread" id="notif-2">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2">
-                            🔔 Payment Received
-                        </button>
-                    </h2>
-                    <div id="collapse2" class="accordion-collapse collapse" data-bs-parent="#notificationAccordion">
-                        <div class="accordion-body">
-                            Your payment of $500 has been successfully received.
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Read Notifications -->
-                <h4 class="text-success mt-3">Read Notifications</h4>
-                <div class="accordion-item notification read">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3">
-                            ✅ Order Shipped
-                        </button>
-                    </h2>
-                    <div id="collapse3" class="accordion-collapse collapse" data-bs-parent="#notificationAccordion">
-                        <div class="accordion-body">
-                            Your order #12345 has been shipped and is on the way.
-                        </div>
-                    </div>
-                </div>
+            <div id="notificationList" class="list-group">
+                <p class="text-center text-muted">Loading notifications...</p>
             </div>
+            <button onclick="clearNotifications()" class="btn btn-danger w-100 mt-3">Clear All Notifications</button>
         </div>
     </div>
     <!--// Notification Offcanvas start-->
@@ -159,7 +120,7 @@
                                 <span class="userprofile-info-icon"><i class="icon-username-check"></i></span>
                                 <div class="flex-1 overflow-hidden font-semi-bold ml-15">
                                     <span class="text-muted d-block ellipsis mb-5">Username</span>
-                                    <span class="text-dark d-block ellipsis fs-15" id="username" ></span>
+                                    <span class="text-dark d-block ellipsis fs-15" id="username"></span>
                                 </div>
                             </div>
                             <div class="userprofile-info d-flex align-items-center">
@@ -358,7 +319,7 @@
 
 <script>
     var user = sessionStorage.getItem("userdata");
-    
+
     if (user) {
         try {
             var userObj = JSON.parse(user); // Parse the JSON string into an object
@@ -374,3 +335,70 @@
 
 
 </html>
+
+
+
+
+
+
+
+<script>
+    function fetchNotifications() {
+        $.ajax({
+            url: "http://localhost:5136/api/task/notifications/2", // Replace 2 with dynamic user ID
+            type: "GET",
+            dataType: "json",
+            success: function (data) {
+                let notificationList = $("#notificationList");
+                let notificationBadge = $("#notificationBadge");
+
+                if (data.length > 0) {
+                    let listItems = data.map(n => `
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            ${n}
+                            <span class="badge bg-primary">New</span>
+                        </div>
+                    `).join("");
+                    notificationList.html(listItems);
+                    notificationBadge.text(data.length).show();
+                } else {
+                    notificationList.html("<p class='text-center text-muted'>No new notifications</p>");
+                    notificationBadge.hide();
+                }
+            },
+            error: function () {
+                $("#notificationList").html("<p class='text-center text-danger'>Error loading notifications</p>");
+            }
+        });
+
+         $.ajax({
+            url: "http://localhost:5136/api/task/notifications/count/2", // Replace 2 with dynamic user ID
+            type: "GET",
+            dataType: "json",
+            success: function (data) {
+                $('#NotificationCount').html(data.notificationCount)
+            },
+            error: function () {
+                $("#notificationList").html("<p class='text-center text-danger'>Error loading notifications</p>");
+            }
+        });
+    }
+
+    function clearNotifications() {
+        $.ajax({
+            url: "http://localhost:5136/api/task/notifications/clear/2", // Replace 2 with dynamic user ID
+            type: "DELETE",
+            success: function () {
+                fetchNotifications(); // Refresh notifications after clearing
+            },
+            error: function () {
+                console.error("Error clearing notifications");
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        fetchNotifications();
+        setInterval(fetchNotifications, 5000);
+    });
+</script>

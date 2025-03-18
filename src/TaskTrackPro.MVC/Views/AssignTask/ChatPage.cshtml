@@ -1,5 +1,6 @@
 @{
-    Layout = "_TaskAdminLayout";
+    ViewData["Title"] = "Chat Page";
+    Layout="../Shared/_TaskAdminLayout.cshtml";
 }
 
 <div class="chat-container">
@@ -37,32 +38,14 @@
             return;
         }
 
-    let connection = new signalR.HubConnectionBuilder()
+        let connection = new signalR.HubConnectionBuilder()
             .withUrl(`http://localhost:5136/chathub?userId=${userId}`)
             .configureLogging(signalR.LogLevel.Information)
             .build();
 
-            @* let connection = new signalR.HubConnectionBuilder()
-                .withUrl(`http://localhost:5136/chathub?userId=${userId}`, {
-                    skipNegotiation: true,
-                    transport: signalR.HttpTransportType.WebSockets
-                })
-                .withAutomaticReconnect()
-                .configureLogging(signalR.LogLevel.Information)
-                .build(); *@
-
-        @* connection.serverTimeoutInMilliseconds = 60000; // Increase timeout to 1 min *@
-
-
         connection.start()
             .then(() => console.log("Connected to SignalR"))
             .catch(err => console.error("SignalR Connection Error:", err));
-
-        connection.onclose(error => {
-            console.error("SignalR connection closed:", error);
-        });
-
-
 
         function formatDate(date) {
             return new Date(date).toLocaleDateString([], { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
