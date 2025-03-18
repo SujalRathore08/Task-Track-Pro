@@ -6,9 +6,6 @@ using TaskTrackPro.Core.Repositories.Commands.Interfaces;
 using TaskTrackPro.Core.Repositories.Queries.Implementations;
 using TaskTrackPro.Core.Repositories.Queries.Interfaces;
 using TaskTrackPro.Core.Services.Messaging;
-using Microsoft.Extensions.Options;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Caching.StackExchangeRedis;
 using TaskTrackPro.API.Services;
 using Elastic.Transport;
 using Elastic.Clients.Elasticsearch;
@@ -37,6 +34,7 @@ builder.Services.AddScoped<IAccountCommand, AccountCommand>();
 builder.Services.AddScoped<ITaskCount, TaskCountRepository>();
 builder.Services.AddScoped<ChatService>();
 builder.Services.AddSingleton<ElasticsearchServices>();
+builder.Services.AddSingleton<ElasticsearchService>();
 
 // ✅ Configure Redis Connection
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
@@ -115,10 +113,32 @@ async Task IndexDataOnStartup(){
     }
 }
 
+async Task IndexUserDataOnStartup(){
+    using var scope = app.Services.CreateScope();
+    var accountCommand = scope.ServiceProvider.GetRequiredService<ITaskInterface>();
+    var elasticService = scope.ServiceProvider.GetRequiredService<ElasticsearchService>();    
+
+    try{
+        await elasticService.CreateIndexAsync();
+        var users = await accountCommand.GetAllUsers(); // Assuming GetUsers() returns a list of users
+        if(users.Count > 0){
+            foreach(var user in users){
+                await elasticService.IndexUserAsync(user);
+            }
+            Console.WriteLine($" {users.Count} users indexed successfully in ElasticSearch.");
+        }else{
+            Console.WriteLine("No users found to index in ElasticSearch.");
+        }
+    }
+    catch(Exception ex){
+        Console.WriteLine($"Error while indexing data in ElasticSearch: {ex.Message}");
+    }
+}
+await IndexUserDataOnStartup();
 await IndexDataOnStartup();
 
 
-// ✅ Use CORS Middleware (Must be before `UseAuthorization`)
+// ✅ Use CORS Middleware (Must be before UseAuthorization)
 app.UseCors("corsapp");
 
 // ✅ Configure Swagger for API documentation

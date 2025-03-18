@@ -18,15 +18,15 @@
 
             <div class="searchbar w100 p-10 pb-5">
                 <div class="clear-input search-box w100">
-                    <input type="text" name="txtTagListSearch" id="txtTagListSearch" aria-label="tag name"
+                    <input type="text" name="txtTagListSearch" id="MemberElaticInput" aria-label="tag name"
                         class="form-control k-textbox k-valid" placeholder="Search Task here...">
                     <i class="icon-search" aria-hidden="true"></i>
-                    <a role="button" id="btnTagListSearch" aria-label="Clear Search" href="javascript:void(0);"
+                    <a role="button" id="ElasticClear" aria-label="Clear Search" href="javascript:void(0);"
                         class="btn-icn-hover close icon-cancel" data-ara-title="Clear Search"></a>
                 </div>
                 <div class="action-div d-flex">
                     <a href="javascript:void(0);" class="btn btn-raised btn-primary btn-block mr-5" role="button"
-                        aria-haspopup="true" aria-expanded="false" id="actionbtnmenu1"><i aria-hidden="true"
+                        aria-haspopup="true" aria-expanded="false" id="MemberElaticSearch"><i aria-hidden="true"
                             class="icon-search"></i><span>Search</span></a>
                 </div>
             </div>
@@ -172,85 +172,6 @@
     });
 </script>
 
-@* <script>
-    $(document).ready(function () {
-        // Fetch Data from API
-        $.ajax({
-            url: "http://localhost:5136/api/Admin/users", // Adjust API URL if needed
-            type: "GET",
-            dataType: "json",
-            success: function (data) {
-                var formattedData = data.map((user, index) => ({
-                    datano: index,
-                    dataid: user.c_uid,
-                    datareq: user.c_uname,
-                    dataTpl: user.c_email,
-                    dataAss: user.c_gender,
-                    dataVal: user.c_profilepicture,
-                    dataInt: user.c_user_status
-                }));
-
-                $("#Dataimportgrid").kendoGrid({
-                    dataSource: {
-                        data: formattedData,
-                        pageSize: 5
-                    },
-                    pageable: true,
-                    scrollable: true,
-                    resizable: false,
-                    autoBind: true,
-                    columns: [
-                        { selectable: true, width: "50px" },
-                        { field: "datano", title: "No", width: "90px" },
-                        { field: "dataid", title: "ID", width: "135px" },
-                        { field: "datareq", title: "Name", width: "200px" },
-                        { field: "dataTpl", title: "Email", width: "200px" },
-                        { field: "dataAss", title: "Gender", width: "120px" },
-                        {
-                            field: "dataVal", title: "Profile Picture", width: "150px",
-                            template: "<img src='/images/#: dataVal #' width='50' height='50' alt='Profile' />"
-                        },
-                        {
-                            field: "dataInt",
-                            title: "Action",
-                            width: "150px",
-                            template: function (dataItem) {
-                                if (dataItem.dataInt) {
-                                    return "<button class='btn btn-success approve-btn' data-id='" + dataItem.dataid + "'>Approved</button>";
-                                } else {
-                                    return "<button class='btn btn-danger  not-approve-btn' data-id='" + dataItem.dataid + "'>Not Approved</button>";
-                                }
-                            }
-                        }
-                    ],
-                    dataBound: function () {
-                        $(".not-approve-btn").click(function () {
-                            var grid = $("#Dataimportgrid").data("kendoGrid");
-                            var row = $(this).closest("tr");
-                            var dataItem = grid.dataItem(row);
-
-                            if (dataItem) {
-                                $("#UserId").val(dataItem.c_tid);
-                                $("#UpdateTaskTitle").val(dataItem.c_task_title);
-                                $("#UpdateusersList").val(dataItem.c_uid);
-                                $("#Updatestartdatetimepicker").val(new Date(dataItem.c_start_date).toISOString().slice(0, 16));
-                                $("#Updateenddatetimepicker").val(new Date(dataItem.c_end_date).toISOString().slice(0, 16));
-                                $("#UpdatetaskDescription").val(dataItem.c_description);
-                            }
-                        });
-                    });
-            },
-            error: function () {
-                alert("Failed to fetch data.");
-            }
-        });
-
-
-    });
-</script> *@
-
-
-
 <script>
     $(document).ready(function () {
         const apiUrl = "http://localhost:5136/api/task";
@@ -323,6 +244,8 @@
                 alert("Failed to fetch data.");
             }
         });
+        
+        
         // Approve User
         $("#approveUserBtn").click(function () {
             let userId = $("#UserId").val();
@@ -340,3 +263,83 @@
     });
 
 </script>
+
+ <script>
+    $('#ElasticClear').click(function(){
+            window.location.reload();
+        })
+    $('#MemberElaticSearch').click(function(){
+        var searchWord = $('#MemberElaticInput').val();
+
+         $.ajax({
+            url: "http://localhost:5136/api/Admin/name?name="+searchWord, // Adjust API URL if needed
+            type: "GET",
+            dataType: "json",
+            success: function (data) {
+                var formattedData = data.map((user, index) => ({
+                    datano: index,
+                    dataid: user.c_uid,
+                    datareq: user.c_uname,
+                    dataTpl: user.c_email,
+                    dataAss: user.c_gender,
+                    dataVal: user.c_profilepicture,
+                    dataInt: user.c_user_status
+                }));
+
+                $("#Dataimportgrid").kendoGrid({
+                    dataSource: {
+                        data: formattedData,
+                        pageSize: 5
+                    },
+                    pageable: true,
+                    scrollable: true,
+                    resizable: false,
+                    autoBind: true,
+                    columns: [
+                        { selectable: true, width: "50px" },
+                        { field: "datano", title: "No", width: "90px" },
+                        { field: "dataid", title: "ID", width: "135px" },
+                        { field: "datareq", title: "Name", width: "200px" },
+                        { field: "dataTpl", title: "Email", width: "200px" },
+                        { field: "dataAss", title: "Gender", width: "120px" },
+                        {
+                            field: "dataVal", title: "Profile Picture", width: "150px",
+                            template: "<img src='/images/#: dataVal #' width='50' height='50' alt='Profile' />"
+                        },
+                        {
+                            field: "dataInt",
+                            title: "Action",
+                            width: "150px",
+                            template: function (dataItem) {
+                                if (dataItem.dataInt) {
+                                    return "<button class='btn btn-success approve-btn' data-id='" + dataItem.dataid + "'>Approved</button>";
+                                } else {
+                                    return "<button class='btn btn-danger not-approve-btn' data-id='" + dataItem.dataid + "'>Not Approved</button>";
+                                }
+                            }
+                        }
+                    ],
+                    dataBound: function () {
+                        $(".not-approve-btn").off("click").on("click", function () {
+                            var grid = $("#Dataimportgrid").data("kendoGrid");
+                            var row = $(this).closest("tr");
+                            var dataItem = grid.dataItem(row);
+
+                            if (dataItem) {
+                                $("#UserId").val(dataItem.dataid);
+                                $("#Username").html(dataItem.datareq);
+                                $("#Useremail").html(dataItem.dataTpl);
+                                $("#UserGender").html(dataItem.dataAss);
+                            }
+                        });
+                    }
+                });
+            },
+            error: function () {
+                alert("Failed to fetch data.");
+            }
+        });
+        
+        
+    })
+ </script>

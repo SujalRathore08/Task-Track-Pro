@@ -21,16 +21,19 @@ namespace TaskTrackPro.API.Controllers
         private readonly IAdminCommand _adminCommand;
 
         private readonly ElasticsearchServices _elasticssearchServices;
+        private readonly ElasticsearchService _elasticssearchService;
         private readonly ITaskInterface _taskInterface;
         private readonly ITaskCount _taskCount;
 
 
-        public AdminController(IAdminQuery adminQuery, ElasticsearchServices elasticssearchServices, IAdminCommand adminCommand, ITaskInterface taskInterface,ITaskCount taskCount)
+        public AdminController(IAdminQuery adminQuery, ElasticsearchServices elasticssearchServices, IAdminCommand adminCommand, ITaskInterface taskInterface,ITaskCount taskCount, ElasticsearchService elasticssearchService)  
         {
             _adminQuery = adminQuery;
             _adminCommand = _adminCommand;
             _elasticssearchServices = elasticssearchServices;
             _taskInterface = taskInterface;
+            _elasticssearchService = elasticssearchService;
+
             _taskCount = taskCount;
             
         }
@@ -43,6 +46,13 @@ namespace TaskTrackPro.API.Controllers
             var uniqueTasks = task.DistinctBy(t => t.c_tid).ToList();
 
             return Ok(uniqueTasks);
+        }
+
+        [HttpGet("name")]
+        public async Task<IActionResult> SearchUser(string name){
+            var user = await _elasticssearchService.SearchUserAsync(name);
+            var uniqueUsers = user.DistinctBy(u => u.c_uid).ToList();
+            return Ok(uniqueUsers);
         }
 
         [HttpGet]
