@@ -51,7 +51,6 @@ namespace TaskTrackPro.API.Services
             }
         }
 
-
         public async Task IndexTaskAsync(t_task task)
         {
             var response = await _client.IndexAsync(task, idx => idx.Index(_indexName));
