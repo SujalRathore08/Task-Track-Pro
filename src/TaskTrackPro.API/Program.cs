@@ -34,6 +34,7 @@ builder.Services.AddScoped<ITaskInterface, TaskRepository>();
 builder.Services.AddScoped<IAdminQuery, AdminQuery>();
 builder.Services.AddScoped<IAdminCommand, AdminCommand>();
 builder.Services.AddScoped<IAccountCommand, AccountCommand>();
+builder.Services.AddScoped<ITaskCount, TaskCountRepository>();
 builder.Services.AddScoped<ChatService>();
 builder.Services.AddSingleton<ElasticsearchServices>();
 

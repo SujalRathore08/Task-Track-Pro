@@ -16,358 +16,88 @@
     <div class="dashboard-left overflow-auto d-flex flex-column">
         <!-- Daily Activity -->
         <div class="dashboard-daily-activity">
-            <h4 class="title font-semi-bold fs-16 text-dark">Daily Activity</h4>
+            <h4 class="title font-semi-bold fs-16 text-dark">Admin Dashboard</h4>
             <div class="dashboard-daily-activity-wrapper">
                 <ul class="dashboard-daily-activity-wrapper-ul d-flex flex-wrap">
                     <li class="dashboard-daily-activity-item border daily-item-success">
                         <div class="d-flex align-items-center">
                             <span class="daily-acitivity-icon"><i class="icon-agentinfoon"></i></span>
-                            <span class="daily-acitivity-count">2</span>
+                            <span id="TotalMember" class="daily-acitivity-count"></span>
                         </div>
                         <div class="daily-acitivity-title text-dark ellipsis">Total Members</div>
                     </li>
                     <li class="dashboard-daily-activity-item border daily-item-green">
                         <div class="d-flex align-items-center">
                             <span class="daily-acitivity-icon"><i class="icon-clock"></i></span>
-                            <span class="daily-acitivity-count">3</span>
+                            <span id="PendingTask" class="daily-acitivity-count"></span>
                         </div>
                         <div class="daily-acitivity-title text-dark ellipsis">Pending Task</div>
                     </li>
                     <li class="dashboard-daily-activity-item border daily-item-brown">
                         <div class="d-flex align-items-center">
                             <span class="daily-acitivity-icon"><i class="icon-invite-user"></i></span>
-                            <span class="daily-acitivity-count">5</span>
+                            <span id="ApproveMembers" class="daily-acitivity-count"></span>
                         </div>
                         <div class="daily-acitivity-title text-dark ellipsis">Approve Users</div>
                     </li>
                     <li class="dashboard-daily-activity-item border daily-item-red">
                         <div class="d-flex align-items-center">
                             <span class="daily-acitivity-icon"><i class="icon-agentinfooff"></i></span>
-                            <span class="daily-acitivity-count">0</span>
+                            <span id="NotApprove" class="daily-acitivity-count">0</span>
                         </div>
-                        <div class="daily-acitivity-title text-dark ellipsis">Failed Inspection</div>
+                        <div class="daily-acitivity-title text-dark ellipsis">Not Approve Users</div>
                     </li>
                 </ul>
             </div>
         </div>
         <!--// Daily Activity -->
-        <!-- Todo Activity -->
-        <div class="todo-inspection-activity-wrapper flex-1 overflow-auto">
-            <div class="d-flex flex-wrap dashboard-row h100">
-                <div class="todo-activity-wrapper dashboard-column-50 d-flex flex-column h100">
-                    <h4 class="title font-semi-bold fs-16 text-dark pb-10">To Do</h4>
-                    <div class="border p-15 todo-activity-box flex-1 overflow-auto">
-                        <table class="todo-activity-table">
-                            <tr>
-                                <td>
-                                    <div class="overflow-hidden font-medium">
-                                        <span class="text-dark d-block ellipsis">Osha Housekeeping Checklist</span>
-                                        <span class="text-muted d-block ellipsis fs-14">Created Date: <span>11 mar 2021
-                                            </span> <span class="separator"></span>Crated By: <span>Subhash
-                                                Dudhat</span> </span>
-                                    </div>
-                                </td>
-                                <td class="todo-activity-table-status-name text-right">
-                                    <button class="btn k-button btn-borderd text-dark mr-10">inspection</button>
-                                </td>
-                                <td class="todo-activity-table-status">
-                                    <span class="text-dark font-medium d-block ellipsis">0% Score</span>
-                                </td>
-                                <td class="todo-activity-table-status text-right">
-                                    <span class="badge badge-primary" data-ara-title="In progress ">In Progress</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="overflow-hidden font-medium">
-                                        <span class="text-dark d-block ellipsis">Osha Housekeeping Checklist</span>
-                                        <span class="text-muted d-block ellipsis fs-14">Created Date: <span>11 mar 2021
-                                            </span> <span class="separator"></span>Crated By: <span>Subhash
-                                                Dudhat</span> </span>
-                                    </div>
-                                </td>
-                                <td class="todo-activity-table-status-name text-right">
-                                    <button class="btn k-button btn-borderd text-dark mr-10">inspection</button>
-                                </td>
-                                <td class="todo-activity-table-status">
-                                    <span class="text-dark font-medium d-block ellipsis">0% Score</span>
-                                </td>
-                                <td class="todo-activity-table-status text-right">
-                                    <span class="badge badge-primary" data-ara-title="In progress">In Progress</span>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-                <div class="inspection-activity-wrapper dashboard-column-50 d-flex flex-column h100">
-                    <h4 class="title font-semi-bold fs-16 text-dark pb-10">Start an Inspection</h4>
-                    <div class="border inspection-activity-box flex-1 overflow-auto">
-                        <ul class="inspection-activity-box-ul">
-                            <li>
-                                <div class="d-flex justify-content-space-between align-items-center">
-                                    <span class="text-dark ellipsis flex-1 font-semi-bold fs-14">Osha HouseKeeping
-                                        CheckList</span>
-                                    <button class="btn btn-primary k-button"
-                                        id="houseKeepingChecklistBtn">Start</button>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="d-flex justify-content-space-between align-items-center">
-                                    <span class="text-dark ellipsis flex-1 font-semi-bold fs-14">Scrum Review</span>
-                                    <button class="btn btn-primary k-button">Start</button>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="d-flex justify-content-space-between align-items-center">
-                                    <span class="text-dark ellipsis flex-1 font-semi-bold fs-14">Is Audit</span>
-                                    <button class="btn btn-primary k-button">Start</button>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="d-flex justify-content-space-between align-items-center">
-                                    <span class="text-dark ellipsis flex-1 font-semi-bold fs-14">Scrum Review</span>
-                                    <button class="btn btn-primary k-button">Start</button>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="d-flex justify-content-space-between align-items-center">
-                                    <span class="text-dark ellipsis flex-1 font-semi-bold fs-14">Is Audit</span>
-                                    <button class="btn btn-primary k-button">Start</button>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!--// Todo Activity -->
-        <!-- User an Existing Inspection Template -->
-        <div class="inspection-template-wrapper">
-            <h4 class="title font-semi-bold fs-16 text-dark mb-10">Use and Existing Inspection Template</h4>
-            <div class="border inspection-template-box">
-                <div class="form-group">
-                    <label for="inspectionTemplateDropdown" class="font-medium">Filterby your industry</label>
-                    <select id="inspectionTemplateDropdown" title="dropdown without search">
-                        <option>General</option>
-                        <option>open</option>
-                        <option>Close</option>
-                    </select>
-                </div>
-                <div class="full-divider mb-15 mt-0"></div>
-                <p class="font-semi-bold text-dark mb-0">Workspace Reopening Checklist for COVID- 19</p>
-            </div>
-        </div>
-        <!--// User an Existing Inspection Template -->
+
+
     </div>
 </div>
 
 
-<!-- Clean Seen Housekeeping Checklist -->
-<div id="houseKeepingChecklist" class="overflow-visible">
-    <div class="housekeeping-wrapper pr h100">
-        <div class="form-wizard-wrapper h100">
-            <div id="housekeepingTabstrip" class="housekeeping-wrapper-tabstrip h100">
-                <ul>
-                    <li class="k-state-active">
-                        <span>Basic Information</span>
-                    </li>
-                    <li>
-                        <span>Audit</span>
-                    </li>
-                </ul>
-                <div class="housekeeping-basic-wrapper">
-                    <div class="d-flex flex-column h100">
-                        <div class="housekeeping-basic-form flex-1 overflow-hidden">
-                            <div class="housekeeping-basic-form-content overflow-auto h100">
-                                <div class="form-group">
-                                    <label for="TitlePage">Title Page</label>
-                                    <select id="TitlePage" title="dropdown without search">
-                                        <option>Audit</option>
-                                        <option>CorPocket</option>
-                                        <option>Web Scrum</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="HClient">Client</label>
-                                    <input type="text" class="k-textbox" id="HClient" />
-                                </div>
-                                <div class="form-group">
-                                    <label for="HCouductdatePicker">Couduct On</label>
-                                    <input id="HCouductdatePicker" class="form-control" title="date picker" />
-                                </div>
-                                <div class="form-group">
-                                    <label for="HInspected">Inspected by</label>
-                                    <input type="text" class="k-textbox" id="HInspected" />
-                                </div>
-                                <div class="form-group">
-                                    <label for="HInspected">Location</label>
-                                    <input type="text" class="k-textbox" id="HInspected" value="Surat" />
-                                </div>
-                            </div>
-                        </div>
-                        <div class="window-footer">
-                            <button class="btn btn-trans k-button">Save</button>
-                            <button class="btn btn-primary k-button">Next</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="housekeeping-basic-wrapper">
-                    <div class="d-flex flex-column h100">
-                        <div class="housekeeping-basic-form flex-1 overflow-hidden">
-                            <div class="housekeeping-basic-form-content housekeeping-audit-panelbar overflow-auto">
-                                <ul id="AuditpanelBar" class="h100">
-                                    <li class="k-state-active">
-                                        <span class="k-link k-state-selected">
-                                            <span class="font-medium text-dark fs-15 ellipsis">Walking and working
-                                                Surface</span>
-                                            <span class="text-muted ellipsis">0/1 (0%)</span>
-                                        </span>
-                                        <div class="housekeeping-audit-panelbar-content">
-                                            <div class="housekeeping-audit-panelbar-content-wrapper">
-                                                <p class="text-dark font-medium fs-14">Are Walkways and working surface
-                                                    clean and clear of debris?</p>
-                                                <ul class="housekeeping-panelbar-tag">
-                                                    <li><button class="btn k-button btn-borderd">Satisfactory</button>
-                                                    </li>
-                                                    <li><button class="btn k-button btn-borderd">Unsatisfactory</button>
-                                                    </li>
-                                                    <li><button class="btn k-button btn-borderd">N/A</button></li>
-                                                </ul>
-                                                <div class="housekeeping-panelbar-addnote pr">
-                                                    <div class="housekeeping-panelbar-addnotetextbox">
-                                                        <input type="text" class="k-textbox" placeholder="Add Note"
-                                                            id="AddNote">
-                                                    </div>
-                                                    <div class="housekeeping-panelbar-textbox-action">
-                                                        <a href="javascript:void(0)"
-                                                            class="text-muted d-inline-flex align-items-center"><i
-                                                                class="icon-media-filled"></i><span
-                                                                class="ml-5">Media</span></a>
-                                                        <a href="javascript:void(0)"
-                                                            class="text-muted d-inline-flex align-items-center ml-20"><i
-                                                                class="icon-action-filled"></i><span
-                                                                class="ml-5">Action</span></a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <span class="k-link">
-                                            <span class="font-medium text-dark fs-15 ellipsis">Lighting</span>
-                                            <span class="text-muted ellipsis">0/1 (0%)</span>
-                                        </span>
-                                        <div class="housekeeping-audit-panelbar-content">
-                                            <div class="housekeeping-audit-panelbar-content-wrapper">
-                                                <div>
-                                                    <p class="text-dark font-medium fs-14">Are lighting fixtures in good
-                                                        working order?</p>
-                                                    <ul class="housekeeping-panelbar-tag">
-                                                        <li><button
-                                                                class="btn k-button btn-borderd">Satisfactory</button>
-                                                        </li>
-                                                        <li><button
-                                                                class="btn k-button btn-borderd">Unsatisfactory</button>
-                                                        </li>
-                                                        <li><button class="btn k-button btn-borderd">N/A</button></li>
-                                                    </ul>
-                                                    <div class="housekeeping-panelbar-addnote pr">
-                                                        <div class="housekeeping-panelbar-addnotetextbox">
-                                                            <input type="text" class="k-textbox" placeholder="Add Note"
-                                                                id="AddNote">
-                                                        </div>
-                                                        <div class="housekeeping-panelbar-textbox-action">
-                                                            <a href="javascript:void(0)"
-                                                                class="text-muted d-inline-flex align-items-center"><i
-                                                                    class="icon-media-filled"></i><span
-                                                                    class="ml-5">Media</span></a>
-                                                            <a href="javascript:void(0)"
-                                                                class="text-muted d-inline-flex align-items-center ml-20"><i
-                                                                    class="icon-action-filled"></i><span
-                                                                    class="ml-5">Action</span></a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="full-divider mt-15 mb-15"></div>
-                                                <div>
-                                                    <p class="text-dark font-medium fs-14">Are lighting fixtures in good
-                                                        working order?</p>
-                                                    <ul class="housekeeping-panelbar-tag">
-                                                        <li><button
-                                                                class="btn k-button btn-borderd">Satisfactory</button>
-                                                        </li>
-                                                        <li><button
-                                                                class="btn k-button btn-borderd">Unsatisfactory</button>
-                                                        </li>
-                                                        <li><button class="btn k-button btn-borderd">N/A</button></li>
-                                                    </ul>
-                                                    <div class="housekeeping-panelbar-addnote pr">
-                                                        <div class="housekeeping-panelbar-addnotetextbox">
-                                                            <input type="text" class="k-textbox" placeholder="Add Note"
-                                                                id="AddNote">
-                                                        </div>
-                                                        <div class="housekeeping-panelbar-textbox-action">
-                                                            <a href="javascript:void(0)"
-                                                                class="text-muted d-inline-flex align-items-center"><i
-                                                                    class="icon-media-filled"></i><span
-                                                                    class="ml-5">Media</span></a>
-                                                            <a href="javascript:void(0)"
-                                                                class="text-muted d-inline-flex align-items-center ml-20"><i
-                                                                    class="icon-action-filled"></i><span
-                                                                    class="ml-5">Action</span></a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <span class="k-link">
-                                            <span class="font-medium text-dark fs-15 ellipsis">Waste Disposal</span>
-                                            <span class="text-muted ellipsis">0/1 (0%)</span>
-                                        </span>
-                                        <div class="housekeeping-audit-panelbar-content">
-                                            <div class="housekeeping-audit-panelbar-content-wrapper">
-                                                <p class="text-dark font-medium fs-14">Are Walkways and working surface
-                                                    clean and clear of debris?</p>
-                                                <ul class="housekeeping-panelbar-tag">
-                                                    <li><button class="btn k-button btn-borderd">Satisfactory</button>
-                                                    </li>
-                                                    <li><button class="btn k-button btn-borderd">Unsatisfactory</button>
-                                                    </li>
-                                                    <li><button class="btn k-button btn-borderd">N/A</button></li>
-                                                </ul>
-                                                <div class="housekeeping-panelbar-addnote pr">
-                                                    <div class="housekeeping-panelbar-addnotetextbox">
-                                                        <input type="text" class="k-textbox" placeholder="Add Note"
-                                                            id="AddNote">
-                                                    </div>
-                                                    <div class="housekeeping-panelbar-textbox-action">
-                                                        <a href="javascript:void(0)"
-                                                            class="text-muted d-inline-flex align-items-center"><i
-                                                                class="icon-media-filled"></i><span
-                                                                class="ml-5">Media</span></a>
-                                                        <a href="javascript:void(0)"
-                                                            class="text-muted d-inline-flex align-items-center ml-20"><i
-                                                                class="icon-action-filled"></i><span
-                                                                class="ml-5">Action</span></a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </li>
-                                </ul>
 
-                            </div>
-                        </div>
-                        <div class="window-footer">
-                            <button class="btn btn-trans k-button">Previous</button>
-                            <button class="btn btn-trans k-button">Save & Draft</button>
-                            <button class="btn btn-primary k-button">Mark as Complete</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+
+
+<script>
+    $(document).ready(function () {
+        var Total;
+        $.ajax({
+            url: "http://localhost:5136/api/Admin/AllMembers",
+            type: "GET",
+            success: function (count) {
+                Total =count;
+                $('#TotalMember').html(count)
+            },
+            error: function (xhr) {
+                alert("Error fetching approved users: " + xhr.responseText);
+            }
+        });
+
+        $.ajax({
+            url: "http://localhost:5136/api/Admin/PendingTask",
+            type: "GET",
+            success: function (count) {
+                console.log(count)
+                $('#PendingTask').html(count)
+            },
+            error: function (xhr) {
+                alert("Error fetching approved users: " + xhr.responseText);
+            }
+        });
+
+        $.ajax({
+            url: "http://localhost:5136/api/Admin/ApproveMembers",
+            type: "GET",
+            success: function (count) {
+                console.log(count)
+                $('#ApproveMembers').html(count)
+                $('#NotApprove').html(Total-count)
+            },
+            error: function (xhr) {
+                alert("Error fetching approved users: " + xhr.responseText);
+            }
+        });
+    })
+</script>

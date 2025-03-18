@@ -159,7 +159,7 @@
                     <option value="">Select Status</option>
                     <option value="Complete">Complete</option>
                     <option value="In Prograss">In Prograss</option>
-                    <option value="Pending">Pending</option>
+                    <option value="PENDING">PENDING</option>
                 </select>
             </div>
             <div class="form-group">
@@ -271,7 +271,7 @@
                 c_start_date: new Date($("#startdatetimepicker").val()).toISOString(), // Convert to ISO format
                 c_end_date: new Date($("#enddatetimepicker").val()).toISOString(),
                 c_description: $("#taskDescription").val(),
-                c_task_status: "Pending" // Default status
+                c_task_status: "PENDING" // Default status
             };
 
             $.ajax({

@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using TaskTrackPro.API.Services;
 using TaskTrackPro.Core.Models;
 using TaskTrackPro.Core.Repositories.Commands.Interfaces;
+using TaskTrackPro.Core.Repositories.Queries.Interfaces;
 
 namespace TaskTrackPro.API.Controllers
 {
@@ -16,11 +17,14 @@ namespace TaskTrackPro.API.Controllers
     {
         private readonly IAccountCommand _accountCommand;
         private readonly RedisService _redisService;
+        private readonly ITaskCount _taskCount;
 
-        public AccountController(IAccountCommand accountCommand, RedisService redisService)
+
+        public AccountController(IAccountCommand accountCommand, RedisService redisService, ITaskCount taskCount)
         {
             _accountCommand = accountCommand;
             _redisService = redisService;
+            _taskCount = taskCount;
         }
 
         [HttpPost("set")]
@@ -124,6 +128,21 @@ namespace TaskTrackPro.API.Controllers
             {
                 return Ok(new { success = false, message = "Invalid Email or Password" });
             }
+        }
+        [HttpGet("pendingTask")]
+        public int GetPendigTaskCount(int userId)
+        {
+             return _taskCount.GetPendingCount(userId);
+        }
+        [HttpGet("completeTask")]
+        public int GetCompleteTaskCount(int userId)
+        {
+            return _taskCount.GetCompletedCount(userId);
+        }
+        [HttpGet("progressTask")]
+        public int GetInProgressTaskCount(int userId)
+        {
+            return _taskCount.GetInProgressCount(userId);
         }
     }
 }

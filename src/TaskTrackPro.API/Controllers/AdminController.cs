@@ -22,13 +22,17 @@ namespace TaskTrackPro.API.Controllers
 
         private readonly ElasticsearchServices _elasticssearchServices;
         private readonly ITaskInterface _taskInterface;
+        private readonly ITaskCount _taskCount;
 
-        public AdminController(IAdminQuery adminQuery, ElasticsearchServices elasticssearchServices, IAdminCommand adminCommand, ITaskInterface taskInterface)
+
+        public AdminController(IAdminQuery adminQuery, ElasticsearchServices elasticssearchServices, IAdminCommand adminCommand, ITaskInterface taskInterface,ITaskCount taskCount)
         {
             _adminQuery = adminQuery;
             _adminCommand = _adminCommand;
             _elasticssearchServices = elasticssearchServices;
             _taskInterface = taskInterface;
+            _taskCount = taskCount;
+            
         }
 
         [HttpGet("{name}")]
@@ -85,6 +89,24 @@ namespace TaskTrackPro.API.Controllers
             {
                 return NotFound(new { message = "User not found or deletion failed." });
             }
+        }
+
+        [HttpGet("AllMembers")]
+        public int GetAllMembers()
+        {
+            return _taskCount.GetAllMembers();
+        }
+
+        [HttpGet("ApproveMembers")]
+        public int ApproveMembers()
+        {
+            return _taskCount.GetApproveMembers();
+        }
+
+        [HttpGet("PendingTask")]
+        public int PendingTask()
+        {
+            return _taskCount.GetPendingTask();
         }
     }
 }
