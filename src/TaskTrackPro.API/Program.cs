@@ -33,6 +33,7 @@ builder.Services.AddScoped<IAdminCommand, AdminCommand>();
 builder.Services.AddScoped<IAccountCommand, AccountCommand>();
 builder.Services.AddScoped<ChatService>();
 builder.Services.AddSingleton<ElasticsearchServices>();
+builder.Services.AddSingleton<ElasticsearchService>();
 
 // ✅ Configure Redis Connection
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
@@ -74,16 +75,16 @@ builder.Services.AddDistributedMemoryCache(); // For in-memory session storage
 
 builder.Services.AddSingleton(provider =>
 {
-var configuration = builder.Configuration;
-var settings = new ElasticsearchClientSettings(new
-Uri(configuration["Elasticsearch:Uri"]))
-.ServerCertificateValidationCallback(CertificateValidations.AllowAll)
-.DefaultIndex(configuration["Elasticsearch:DefaultIndex"])
-.Authentication(new
-BasicAuthentication(configuration["Elasticsearch:Username"],
-configuration["Elasticsearch:Password"]))
-.DisableDirectStreaming();
-return new ElasticsearchClient(settings);
+    var configuration = builder.Configuration;
+    var settings = new ElasticsearchClientSettings(new
+    Uri(configuration["Elasticsearch:Uri"]))
+    .ServerCertificateValidationCallback(CertificateValidations.AllowAll)
+    .DefaultIndex(configuration["Elasticsearch:DefaultIndex"])
+    .Authentication(new
+    BasicAuthentication(configuration["Elasticsearch:Username"],
+    configuration["Elasticsearch:Password"]))
+    .DisableDirectStreaming();
+    return new ElasticsearchClient(settings);
 });
 
 
@@ -111,6 +112,28 @@ async Task IndexDataOnStartup(){
     }
 }
 
+async Task IndexUserDataOnStartup(){
+    using var scope = app.Services.CreateScope();
+    var accountCommand = scope.ServiceProvider.GetRequiredService<ITaskInterface>();
+    var elasticService = scope.ServiceProvider.GetRequiredService<ElasticsearchService>();    
+
+    try{
+        await elasticService.CreateIndexAsync();
+        var users = await accountCommand.GetAllUsers(); // Assuming GetUsers() returns a list of users
+        if(users.Count > 0){
+            foreach(var user in users){
+                await elasticService.IndexUserAsync(user);
+            }
+            Console.WriteLine($" {users.Count} users indexed successfully in ElasticSearch.");
+        }else{
+            Console.WriteLine("No users found to index in ElasticSearch.");
+        }
+    }
+    catch(Exception ex){
+        Console.WriteLine($"Error while indexing data in ElasticSearch: {ex.Message}");
+    }
+}
+await IndexUserDataOnStartup();
 await IndexDataOnStartup();
 
 
