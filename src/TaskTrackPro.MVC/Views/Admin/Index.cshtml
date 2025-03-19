@@ -1,7 +1,8 @@
 @{
-    Layout = "_Custom";
+    Layout = "_CustomA";
 }
-<!-- Menu Section-->
+
+<!-- Menu Section -->
 <section class="main-section-menu bg-light bb-1">
     <ul class="main-section-menu-ul" id="mainSectionMenu">
         <li><a href="javascript:void(0);" id="iAuditDashboard" class="ms-menu-link active">Dashboard</a></li>
@@ -11,9 +12,9 @@
         <li><a id="logout" class="ms-menu-link">Logout</a></li>
     </ul>
 </section>
-<!--// Menu Section-->
 
-<div class="d-flex dashboard-wrapper justify-content-center  h100">
+<!-- Dashboard Section -->
+<div class="d-flex dashboard-wrapper justify-content-center h100">
     <div class="dashboard-left overflow-auto d-flex flex-column">
         <!-- Daily Activity -->
         <div class="dashboard-daily-activity">
@@ -23,90 +24,157 @@
                     <li class="dashboard-daily-activity-item border daily-item-success">
                         <div class="d-flex align-items-center">
                             <span class="daily-acitivity-icon"><i class="icon-agentinfoon"></i></span>
-                            <span id="TotalMember" class="daily-acitivity-count"></span>
+                            <span id="TotalMember" class="daily-acitivity-count">0</span>
                         </div>
                         <div class="daily-acitivity-title text-dark ellipsis">Total Members</div>
                     </li>
                     <li class="dashboard-daily-activity-item border daily-item-green">
                         <div class="d-flex align-items-center">
                             <span class="daily-acitivity-icon"><i class="icon-clock"></i></span>
-                            <span id="PendingTask" class="daily-acitivity-count"></span>
+                            <span id="PendingTask" class="daily-acitivity-count">0</span>
                         </div>
                         <div class="daily-acitivity-title text-dark ellipsis">Pending Task</div>
                     </li>
                     <li class="dashboard-daily-activity-item border daily-item-brown">
                         <div class="d-flex align-items-center">
                             <span class="daily-acitivity-icon"><i class="icon-invite-user"></i></span>
-                            <span id="ApproveMembers" class="daily-acitivity-count"></span>
+                            <span id="ApproveMembers" class="daily-acitivity-count">0</span>
                         </div>
-                        <div class="daily-acitivity-title text-dark ellipsis">Approve Users</div>
+                        <div class="daily-acitivity-title text-dark ellipsis">Approved Users</div>
                     </li>
                     <li class="dashboard-daily-activity-item border daily-item-red">
                         <div class="d-flex align-items-center">
                             <span class="daily-acitivity-icon"><i class="icon-agentinfooff"></i></span>
                             <span id="NotApprove" class="daily-acitivity-count">0</span>
                         </div>
-                        <div class="daily-acitivity-title text-dark ellipsis">Not Approve Users</div>
+                        <div class="daily-acitivity-title text-dark ellipsis">Not Approved Users</div>
                     </li>
                 </ul>
             </div>
         </div>
-        <!--// Daily Activity -->
 
+        <!-- Dropdown Filter -->
+        <div class="dropdown my-3">
+            <label for="dataFilter">Select Data Type:</label>
+            <select id="dataFilter" class="form-control">
+                <option value="All">All Data</option>
+                <option value="TotalMembers">Total Members</option>
+                <option value="Approved">Approved Tasks</option>
+                <option value="Pending">Pending Tasks</option>
+            </select>
+        </div>
 
+        <!-- Chart Visualization -->
+        <div class="charts-container d-flex flex-wrap justify-content-center">
+            <div class="chart-wrapper"><canvas id="barChart"></canvas></div>
+            <div class="chart-wrapper"><canvas id="doughnutChart"></canvas></div>
+            <div class="chart-wrapper"><canvas id="lineChart"></canvas></div>
+            <div class="chart-wrapper"><canvas id="pieChart"></canvas></div>
+            <div class="chart-wrapper"><canvas id="radarChart"></canvas></div>
+            <div class="chart-wrapper"><canvas id="polarChart"></canvas></div>
+        </div>
     </div>
 </div>
 
+<!-- Styles -->
+<style>
+    .charts-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+        padding: 20px;
+    }
 
+    .chart-wrapper {
+        width: 350px;
+        height: 350px;
+    }
 
+    canvas {
+        width: 100% !important;
+        height: 100% !important;
+    }
+</style>
 
-
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     $(document).ready(function () {
-        var Total;
-        $.ajax({
-            url: "http://localhost:5136/api/Admin/AllMembers",
-            type: "GET",
-            success: function (count) {
-                Total =count;
-                $('#TotalMember').html(count)
-            },
-            error: function (xhr) {
-                alert("Error fetching approved users: " + xhr.responseText);
-            }
+        let totalMembers = 0, approvedTasks = 0, pendingTasks = 0;
+
+        function fetchData(callback) {
+            $.when(
+                $.get("http://localhost:5136/api/Admin/AllMembers", function (count) {
+                    totalMembers = count;
+                    $('#TotalMember').html(count);
+                }),
+                $.get("http://localhost:5136/api/Admin/PendingTask", function (count) {
+                    pendingTasks = count;
+                    $('#PendingTask').html(count);
+                }),
+                $.get("http://localhost:5136/api/Admin/ApproveMembers", function (count) {
+                    approvedTasks = count;
+                    $('#ApproveMembers').html(count);
+                    $('#NotApprove').html(totalMembers - count);
+                })
+            ).then(function () {
+                if (callback) callback();
+            });
+        }
+
+        const chartConfigs = [
+            { id: 'barChart', type: 'bar' },
+            { id: 'doughnutChart', type: 'doughnut' },
+            { id: 'lineChart', type: 'line' },
+            { id: 'pieChart', type: 'pie' },
+            { id: 'radarChart', type: 'radar' },
+            { id: 'polarChart', type: 'polarArea' }
+        ];
+
+        let chartData = {
+            labels: ["Total Members", "Approved", "Pending"],
+            datasets: [{
+                label: 'User Stats',
+                data: [totalMembers, approvedTasks, pendingTasks],
+                backgroundColor: ['blue', 'green', 'red']
+            }]
+        };
+
+        const charts = {};
+        chartConfigs.forEach(config => {
+            const ctx = document.getElementById(config.id).getContext('2d');
+            charts[config.id] = new Chart(ctx, { type: config.type, data: chartData });
         });
 
-        $.ajax({
-            url: "http://localhost:5136/api/Admin/PendingTask",
-            type: "GET",
-            success: function (count) {
-                console.log(count)
-                $('#PendingTask').html(count)
-            },
-            error: function (xhr) {
-                alert("Error fetching approved users: " + xhr.responseText);
+        function updateCharts() {
+            chartData.datasets[0].data = [totalMembers, approvedTasks, pendingTasks];
+            Object.values(charts).forEach(chart => chart.update());
+        }
+
+        fetchData(updateCharts);
+
+        $("#dataFilter").change(function () {
+            let selected = $(this).val();
+            let newData;
+
+            if (selected === "TotalMembers") {
+                newData = [totalMembers, 0, 0];
+            } else if (selected === "Approved") {
+                newData = [0, approvedTasks, 0];
+            } else if (selected === "Pending") {
+                newData = [0, 0, pendingTasks];
+            } else {
+                newData = [totalMembers, approvedTasks, pendingTasks];
             }
+
+            chartData.datasets[0].data = newData;
+            Object.values(charts).forEach(chart => chart.update());
         });
 
-        $.ajax({
-            url: "http://localhost:5136/api/Admin/ApproveMembers",
-            type: "GET",
-            success: function (count) {
-                console.log(count)
-                $('#ApproveMembers').html(count)
-                $('#NotApprove').html(Total-count)
-            },
-            error: function (xhr) {
-                alert("Error fetching approved users: " + xhr.responseText);
-            }
-        });
-    })
-</script>
-<script>
-    $(document).ready(function () {
         $("#logout").on("click", function (e) {
             e.preventDefault();
-            sessionStorage.removeItem("userEmail");
+            sessionStorage.clear();
             window.location.replace("/Home/Login");
         });
     });

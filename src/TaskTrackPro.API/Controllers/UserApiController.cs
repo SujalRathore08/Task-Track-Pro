@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MimeKit;
 using RabbitMQ.Client;
 using StackExchange.Redis;
 using TaskTrackPro.Core.Models;
@@ -208,5 +210,63 @@ namespace TaskTrackPro.API.Controllers
             }
         }
 
+        [HttpPut]
+        [Route("ChangePassword")]
+        public async Task<IActionResult> ChangePassword([FromForm] t_ChangePassword model)
+        {
+            // var userId = HttpContext.Session.GetInt32("c_uid");
+            // if (userId == null) return Unauthorized(new { success = false, message = "User not logged in." });
+
+            var user = await _user.GetUser(model.c_uid);
+            if (user == null) return NotFound(new { success = false, message = "User not found." });
+
+            if (model.OldPassword == null && user.c_password == null && !BCrypt.Net.BCrypt.Verify(model.OldPassword, user.c_password))
+            {
+               
+                return BadRequest(new { success = false, message = "Current password is incorrect" });
+            }
+
+            user.c_password = BCrypt.Net.BCrypt.HashPassword(model.NewPassword);
+            var status = await _user.ChangePassword(user);
+
+            if (status > 0)
+                return Ok(new { success = true, message = "Password changed successfully" });
+
+            return BadRequest(new { success = false, message = "Error changing password" });
+        }
+
+        [HttpPut]
+        [Route("UpdateProfile")]
+        public async Task<IActionResult> UpdateProfile([FromForm] t_UserUpdate model)
+        {
+            // var userId = HttpContext.Session.GetInt32("c_uid");
+            // if (userId == null) return Unauthorized(new { success = false, message = "User not logged in." });
+
+            // var user = await _user.GetUser(userId.Value);
+            // if (user == null) return NotFound(new { success = false, message = "User not found." });
+
+            // user.c_uname = model.c_uname;
+            // user.c_email = model.c_email;
+            // user.c_gender = model.c_gender;
+
+            if (model.c_profile != null && model.c_profile.Length > 0)
+            {
+                var fileName = model.c_email + Path.GetExtension(model.c_profile.FileName);
+                var filePath = Path.Combine("../TaskTrackPro.MVC/wwwroot/profile_images", fileName);
+                model.c_profilepicture = fileName;
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await model.c_profile.CopyToAsync(stream);
+                }
+            }
+
+            var status = await _user.UpdateProfile(model);
+
+            if (status > 0)
+                return Ok(new { success = true, message = "Profile updated successfully" });
+
+            return BadRequest(new { success = false, message = "Error updating profile" });
+        }
     }
 }
