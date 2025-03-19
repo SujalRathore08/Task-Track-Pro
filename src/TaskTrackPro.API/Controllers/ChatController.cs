@@ -1,13 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
-using Repositories.Implementations;
+// using Repositories.Implementations;
 // using Repositories.Interfaces;
 // using Repositories.Models;
 using System;
 using System.Threading.Tasks;
 using TaskTrackPro.API.Controllers;
 using TaskTrackPro.Core.Models;
+using TaskTrackPro.Core.Repositories.Commands.Implementations;
 
 [Route("api/chat")]
 [ApiController]

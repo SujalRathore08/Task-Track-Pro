@@ -114,6 +114,7 @@ namespace TaskTrackPro.API.Controllers
         [HttpPut("update")]
         public async Task<IActionResult> UpdateTask([FromBody] t_task task)
         {
+            Console.WriteLine(task);
             if (task == null || task.c_tid == 0)
             {
                 return BadRequest("Invalid task data.");

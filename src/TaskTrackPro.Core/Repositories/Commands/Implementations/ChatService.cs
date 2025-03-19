@@ -8,11 +8,11 @@ using Newtonsoft.Json;
 using Npgsql;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-// using Repositories.Models;
 using StackExchange.Redis;
 using TaskTrackPro.Core.Models;
+using TaskTrackPro.Core.Repositories.Commands.Interfaces;
 
-namespace Repositories.Implementations
+namespace TaskTrackPro.Core.Repositories.Commands.Implementations
 {
     public class ChatService : IDisposable
     {

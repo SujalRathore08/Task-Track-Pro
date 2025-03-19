@@ -5,7 +5,7 @@ using TaskTrackPro.Core.Repositories.Commands.Implementations;
 using TaskTrackPro.Core.Repositories.Commands.Interfaces;
 using TaskTrackPro.Core.Repositories.Queries.Implementations;
 using TaskTrackPro.Core.Repositories.Queries.Interfaces;
-using TaskTrackPro.Core.Services.Messaging;
+// using TaskTrackPro.Core.Services.Messaging;
 using TaskTrackPro.API.Services;
 using Elastic.Transport;
 using Elastic.Clients.Elasticsearch;
@@ -175,6 +175,7 @@ if (app.Environment.IsDevelopment())
 var consumer = app.Services.GetRequiredService<UserRegistrationConsumer>();
 Task.Run(() => consumer.StartListening());
 
+app.UseWebSockets();
 app.UseHttpsRedirection();
 app.UseSession(); // Enables session middleware
 app.UseAuthorization(); // Handles authentication & authorization

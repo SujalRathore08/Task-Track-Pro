@@ -6,8 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
-using Repositories.Implementations;
+// using Repositories.Implementations;
 using TaskTrackPro.Core.Models;
+using TaskTrackPro.Core.Repositories.Commands.Implementations;
 
 namespace TaskTrackPro.API.Controllers
 {

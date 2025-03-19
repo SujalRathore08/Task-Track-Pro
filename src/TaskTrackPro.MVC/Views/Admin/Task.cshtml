@@ -8,6 +8,7 @@
         <li><a asp-action="Members" id="iAuditTemplate" class="ms-menu-link">Members</a></li>
         <li><a href="javascript:void(0);" id="iAuditInspection" class="ms-menu-link active">Task</a></li>
         <li><a asp-action="Messages" id="iAuditAnalytics" class="ms-menu-link">Messages</a></li>
+        <li><a id="logout" class="ms-menu-link">Logout</a></li>
     </ul>
 </section>
 <!--// Menu Section-->
@@ -26,13 +27,12 @@
                                 <input type="text" name="txtTagListSearch" id="TaskElaticInput" aria-label="tag name"
                                     class="form-control k-textbox k-valid" placeholder="Search Task here...">
                                 <i class="icon-search" aria-hidden="true"></i>
-                                <a role="button" id="ElasticClear" aria-label="Clear Search"
-                                    href="javascript:void(0);" class="btn-icn-hover close icon-cancel"
-                                    data-ara-title="Clear Search"></a>
+                                <a role="button" id="ElasticClear" aria-label="Clear Search" href="javascript:void(0);"
+                                    class="btn-icn-hover close icon-cancel" data-ara-title="Clear Search"></a>
                             </div>
                             <div class="action-div d-flex">
                                 <a href="javascript:void(0);" class="btn btn-raised btn-primary btn-block mr-5"
-                                    role="button" aria-haspopup="true" aria-expanded="false"  id="TaskElaticSearch"><i
+                                    role="button" aria-haspopup="true" aria-expanded="false" id="TaskElaticSearch"><i
                                         aria-hidden="true" class="icon-search"></i><span>Search</span></a>
 
 
@@ -117,7 +117,7 @@
             <h5 class="fw-bolder">Task Duration</h5>
             <p>
 
-            <span id="Delstartdatetimepicker"></span> -- <span id="Delenddatetimepicker"></span>
+                <span id="Delstartdatetimepicker"></span> -- <span id="Delenddatetimepicker"></span>
             </p>
         </div>
         <div class="mb-10">
@@ -137,7 +137,7 @@
             <input hidden type="text" id="taskId">
             <div class="form-group">
                 <label>Task Title</label>
-                <input id="UpdateTaskTitle" type="text" class="form-control" >
+                <input id="UpdateTaskTitle" type="text" class="form-control">
             </div>
             <div class="form-group mb-10">
                 <label for="UpdateusersList">Select Member</label>
@@ -158,8 +158,8 @@
                 <select id="Updatestatus" class="form-control">
                     <option value="">Select Status</option>
                     <option value="Complete">Complete</option>
-                    <option value="In Prograss">In Prograss</option>
-                    <option value="PENDING">PENDING</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Pending">Pending</option>
                 </select>
             </div>
             <div class="form-group">
@@ -312,10 +312,11 @@
                 url: apiUrl + "/approved-users",
                 type: "GET",
                 success: function (users) {
+                    console.log(users);
                     let usersDropdown = $("#usersList");
                     let usersDropdown2 = $("#UpdateusersList");
                     users.forEach(user => {
-                        let option = `<option value="${user.c_uid}">${user.c_uname}</option>`;
+                        let option = `<option value="${user.c_uid}">${user.Email}</option>`;
                         usersDropdown.append(option);
                         usersDropdown2.append(option);
                     });
@@ -360,6 +361,7 @@
                 data: JSON.stringify(updatedTask),
                 success: function (response) {
                     alert(response.message);
+                    $("#taskGrid").data("kendoGrid").dataSource.read();
                 },
                 error: function (xhr) {
                     alert("Error updating task: " + xhr.responseText);
@@ -375,6 +377,7 @@
                 type: "DELETE",
                 success: function (response) {
                     alert(response.message);
+                    $("#taskGrid").data("kendoGrid").dataSource.read(); // Refresh grid if needed
                 },
                 error: function (xhr) {
                     alert("Error deleting task: " + xhr.responseText);
@@ -387,12 +390,11 @@
 <script>
     $(document).ready(function () {
         LoadGridData()
-        $('#ElasticClear').click(function(){
+        $('#ElasticClear').click(function () {
             window.location.reload();
         })
 
-        function LoadGridData()
-        {
+        function LoadGridData() {
             // Fetch Data from API
             var taskDataSource = new kendo.data.DataSource({
                 transport: {
@@ -498,13 +500,13 @@
 </script>
 
 <script>
-    $("#TaskElaticSearch").click(function (){
+    $("#TaskElaticSearch").click(function () {
         var searchWord = $('#TaskElaticInput').val()
-         // Fetch Data from API
+        // Fetch Data from API
         var taskDataSource = new kendo.data.DataSource({
             transport: {
                 read: {
-                    url: "http://localhost:5136/api/Admin/"+searchWord,
+                    url: "http://localhost:5136/api/Admin/" + searchWord,
                     dataType: "json"
                 }
             },
@@ -601,4 +603,12 @@
         });
     })
 </script>
-
+<script>
+    $(document).ready(function () {
+        $("#logout").on("click", function (e) {
+            e.preventDefault();
+            sessionStorage.removeItem("userEmail");
+            window.location.replace("/Home/Login");
+        });
+    });
+</script>

@@ -1,25 +1,31 @@
 @{
     ViewData["Title"] = "Chat Page";
-    Layout="../Shared/_TaskAdminLayout.cshtml";
+    Layout = "../Shared/_TaskAdminLayout.cshtml";
 }
 
 <div class="chat-container">
     <h2>Chat with</h2>
-    <select name="users" id="users" class="form-control">
-        <option value="" selected disabled>-- Select User/Admin --</option>
-    </select>
-
-    <select name="online-users" id="online-users" class="form-control">
-        <option value="" selected disabled>-- Online Users --</option>
-    </select>
-
-    <div id="chatBox" class="chat-box"></div>
-
+    <input type="text" value="dhruvilbarvaliya20@gmail.com" readonly>
+    <div class="chat-box">
+        <div class="other-message message">
+            <span class="sender">dhruvilbarvaliya20@gmail.com:</span> hello Admin
+            <span class="timestamp">09:51 PM</span>
+        </div>
+        <div class="user-message message">
+            <span class="sender">You:</span> hello Dhruvil
+            <span class="timestamp">09:50 PM</span>
+        </div>
+        <div class="user-message message">
+            <span class="sender">You:</span> sdf
+            <span class="timestamp">10:03 PM</span>
+        </div>
+    </div>
     <div class="chat-input">
-        <input type="text" id="messageInput" placeholder="Type a message..." class="form-control" />
-        <button id="sendBtn" class="btn btn-primary">Send</button>
+        <input type="text" placeholder="Type a message...">
+        <button>Send</button>
     </div>
 </div>
+
 
 <!-- SignalR & jQuery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
@@ -202,58 +208,95 @@
 
 <style>
     .chat-container {
-        max-width: 600px;
-        margin: 20px auto;
-        padding: 10px;
+        width: 60%;
+        /* Adjust width as needed */
+        max-width: 800px;
+        height: 600px;
+        /* Increase height */
+        margin: auto;
+        padding: 20px;
+        background: white;
         border-radius: 10px;
-        background: #f8f9fa;
         box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
     }
 
     .chat-box {
-        height: 400px;
+        flex-grow: 1;
+        height: 450px;
+        /* Increase height */
         overflow-y: auto;
-        border: 1px solid #ccc;
-        padding: 10px;
-        background: #fff;
+        padding: 15px;
+        background: #f9f9f9;
+        border-radius: 5px;
+        display: flex;
+        flex-direction: column;
     }
 
-    .chat-date {
-        text-align: center;
-        margin: 10px 0;
-        font-size: 12px;
-        color: #666;
-        background: #e0e0e0;
-        padding: 5px 10px;
-        border-radius: 10px;
-        display: inline-block;
-    }
-
+    /* Style messages */
     .message {
-        max-width: 75%;
-        padding: 8px 12px;
-        margin: 5px;
+        padding: 10px 15px;
         border-radius: 10px;
+        margin-bottom: 10px;
+        max-width: 75%;
         word-wrap: break-word;
     }
 
-    .sent {
-        background: #dcf8c6;
-        float: right;
+    /* User messages */
+    .user-message {
+        background: #d4f8c6;
+        align-self: flex-end;
         text-align: right;
-        clear: both;
     }
 
-    .received {
+    /* Other user messages */
+    .other-message {
         background: #ffffff;
-        float: left;
+        border: 1px solid #ddd;
+        align-self: flex-start;
         text-align: left;
-        border: 1px solid #ccc;
-        clear: both;
     }
 
-    .msg-time {
-        font-size: 10px;
-        color: #666;
+    /* Sender's email styling */
+    .sender {
+        font-weight: bold;
+        color: #555;
+    }
+
+    /* Time styling */
+    .timestamp {
+        font-size: 12px;
+        color: #777;
+        margin-left: 5px;
+    }
+
+    /* Input and send button */
+    .chat-input {
+        display: flex;
+        margin-top: 10px;
+    }
+
+    .chat-input input {
+        flex-grow: 1;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+    }
+
+    .chat-input button {
+        margin-left: 5px;
+        padding: 10px 15px;
+        border: none;
+        background: #4285f4;
+        color: white;
+        font-size: 16px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .chat-input button:hover {
+        background: #3367d6;
     }
 </style>

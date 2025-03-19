@@ -1,7 +1,19 @@
 @{
-    Layout = "_TaskAdminLayout";
+    Layout = "_Custom";
 }
 
+<!-- Menu Section -->
+<section class="main-section-menu bg-light bb-1">
+    <ul class="main-section-menu-ul" id="mainSectionMenu">
+        <li><a asp-action="Index" id="iAuditDashboard" class="ms-menu-link">Dashboard</a></li>
+        <li><a asp-action="Members" id="iAuditTemplate" class="ms-menu-link">Members</a></li>
+        <li><a asp-action="Task" id="iAuditInspection" class="ms-menu-link">Task</a></li>
+        <li><a href="javascript:void(0);" id="iAuditAnalytics" class="ms-menu-link active">Messages</a></li>
+        <li><a id="logout" class="ms-menu-link">Logout</a></li>
+    </ul>
+</section>
+
+<!-- Chat Section -->
 <div class="chat-container">
     <h2>Chat with</h2>
     <select name="users" id="users" class="form-control">
@@ -33,36 +45,18 @@
 
         if (!userId) {
             alert("User not logged in. Redirecting to login page.");
-            window.location.href = "/Login";
+            window.location.href = "../Home/Login";
             return;
         }
 
-    let connection = new signalR.HubConnectionBuilder()
+        let connection = new signalR.HubConnectionBuilder()
             .withUrl(`http://localhost:5136/chathub?userId=${userId}`)
             .configureLogging(signalR.LogLevel.Information)
             .build();
 
-            @* let connection = new signalR.HubConnectionBuilder()
-                .withUrl(`http://localhost:5136/chathub?userId=${userId}`, {
-                    skipNegotiation: true,
-                    transport: signalR.HttpTransportType.WebSockets
-                })
-                .withAutomaticReconnect()
-                .configureLogging(signalR.LogLevel.Information)
-                .build(); *@
-
-        @* connection.serverTimeoutInMilliseconds = 60000; // Increase timeout to 1 min *@
-
-
         connection.start()
             .then(() => console.log("Connected to SignalR"))
             .catch(err => console.error("SignalR Connection Error:", err));
-
-        connection.onclose(error => {
-            console.error("SignalR connection closed:", error);
-        });
-
-
 
         function formatDate(date) {
             return new Date(date).toLocaleDateString([], { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
@@ -91,7 +85,7 @@
                 <p><b>${isSender ? "You" : senderId}:</b> ${message} 
                 <sub class="msg-time">${messageTime}</sub></p></div>`;
 
-            chatBox.append(messageHtml);
+            chatBox.prepend(messageHtml);
             chatBox.scrollTop(chatBox[0].scrollHeight);
         }
 
@@ -161,7 +155,6 @@
             connection.invoke("SendMessage", userId, otherUserId, message)
                 .catch(err => console.error("SignalR SendMessage Error:", err));
         });
-
         function loadUsers() {
             $.ajax({
                 url: "http://localhost:5136/api/UserApi/loadUsers",
@@ -184,7 +177,7 @@
                     console.error("Failed to load users. Error:", error);
                 }
             });
-        }
+        };
         function loadOnlineUsers() {
             $.ajax({
                 url: "http://localhost:5136/api/UserApi/getOnlineUsers",
@@ -206,7 +199,7 @@
                     console.error("Failed to load online users. Error:", error);
                 }
             });
-        }
+        };
         $("#users").change(function () {
             otherUserId = $(this).val();
             loadMessages();
@@ -225,29 +218,34 @@
         border-radius: 10px;
         background: #f8f9fa;
         box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        height: 500px; /* Adjust height as needed */
     }
 
     .chat-box {
-        height: 400px;
+        flex-grow: 1;
+        height: 100%;
         overflow-y: auto;
         border: 1px solid #ccc;
         padding: 10px;
         background: #fff;
+        display: flex;
+        flex-direction: column-reverse; /* Ensures new messages appear at the bottom */
     }
 
-    .chat-date {
-        text-align: center;
-        margin: 10px 0;
-        font-size: 12px;
-        color: #666;
-        background: #e0e0e0;
-        padding: 5px 10px;
-        border-radius: 10px;
-        display: inline-block;
+    .chat-input {
+        display: flex;
+        gap: 10px;
+        padding-top: 10px;
+    }
+
+    .chat-input input {
+        flex-grow: 1;
     }
 
     .message {
-        max-width: 75%;
+        max-width: 100%;
         padding: 8px 12px;
         margin: 5px;
         border-radius: 10px;

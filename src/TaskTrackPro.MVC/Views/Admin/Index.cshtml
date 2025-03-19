@@ -8,6 +8,7 @@
         <li><a asp-action="Members" id="iAuditTemplate" class="ms-menu-link">Members</a></li>
         <li><a asp-action="Task" id="iAuditInspection" class="ms-menu-link">Task</a></li>
         <li><a asp-action="Messages" id="iAuditAnalytics" class="ms-menu-link">Messages</a></li>
+        <li><a id="logout" class="ms-menu-link">Logout</a></li>
     </ul>
 </section>
 <!--// Menu Section-->
@@ -100,4 +101,13 @@
             }
         });
     })
+</script>
+<script>
+    $(document).ready(function () {
+        $("#logout").on("click", function (e) {
+            e.preventDefault();
+            sessionStorage.removeItem("userEmail");
+            window.location.replace("/Home/Login");
+        });
+    });
 </script>

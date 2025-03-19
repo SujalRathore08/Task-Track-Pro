@@ -155,7 +155,7 @@ namespace TaskTrackPro.API.Controllers
                 Console.WriteLine("Login Success");
                 Console.WriteLine($"User Email: {data.c_email}");
 
-                return Ok(new { message = "Login Success", data = data });
+                return Ok(new { success = true, message = "Login Success", data = data });
             }
             catch (Exception ex)
             {
@@ -178,8 +178,22 @@ namespace TaskTrackPro.API.Controllers
                 return StatusCode(500, new { success = false, message = "An error occurred while loading users." });
             }
         }
+        [HttpPost("logout")]
+        public IActionResult Logout([FromQuery] string userEmail)
+        {
+            try
+            {
+                _redis.SetRemove("online_users", userEmail);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Redis connection failed while removing user from online list.");
+            }
 
-         [HttpGet("getOnlineUsers")]
+            HttpContext.Session.Clear();
+            return Ok(new { success = true, message = "Logout successful" });
+        }
+        [HttpGet("getOnlineUsers")]
         public IActionResult GetOnlineUsers()
         {
             try
