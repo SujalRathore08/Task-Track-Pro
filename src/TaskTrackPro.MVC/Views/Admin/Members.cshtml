@@ -185,8 +185,8 @@
             dataType: "json",
             success: function (data) {
                 var formattedData = data.map((user, index) => ({
-                    @* datano: index,
-                    dataid: user.c_uid, *@
+                    datano: index,
+                    dataid: user.c_uid,
                     datareq: user.Name,
                     dataTpl: user.Email,
                     dataAss: user.c_gender,
@@ -205,8 +205,8 @@
                     autoBind: true,
                     columns: [
                         { selectable: true, width: "50px" },
-                        @* { field: "datano", title: "No", width: "90px" },
-                        { field: "dataid", title: "ID", width: "135px" }, *@
+                        { field: "datano", title: "No", width: "90px" },
+                        { field: "dataid", title: "ID", width: "135px" },
                         { field: "datareq", title: "Name", width: "200px" },
                         { field: "dataTpl", title: "Email", width: "200px" },
                         { field: "dataAss", title: "Gender", width: "120px" },
