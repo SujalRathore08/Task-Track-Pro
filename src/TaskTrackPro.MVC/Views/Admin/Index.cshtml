@@ -64,6 +64,12 @@
             </select>
         </div>
 
+        <!-- Export Data Button -->
+<div class="text-center my-3">
+    <button id="exportData" class="btn btn-primary">Export Data</button>
+</div>
+
+
         <!-- Chart Visualization -->
         <div class="charts-container d-flex flex-wrap justify-content-center">
             <div class="chart-wrapper"><canvas id="barChart"></canvas></div>
@@ -122,6 +128,34 @@
                 if (callback) callback();
             });
         }
+
+        $("#exportData").on("click", function () {
+    let selected = $("#dataFilter").val();
+    let dataToExport;
+
+    if (selected === "TotalMembers") {
+        dataToExport = [["Category", "Count"], ["Total Members", totalMembers]];
+    } else if (selected === "Approved") {
+        dataToExport = [["Category", "Count"], ["Approved Tasks", approvedTasks]];
+    } else if (selected === "Pending") {
+        dataToExport = [["Category", "Count"], ["Pending Tasks", pendingTasks]];
+    } else {
+        dataToExport = [["Category", "Count"], 
+                        ["Total Members", totalMembers], 
+                        ["Approved Tasks", approvedTasks], 
+                        ["Pending Tasks", pendingTasks]];
+    }
+
+    let csvContent = "data:text/csv;charset=utf-8," + dataToExport.map(e => e.join(",")).join("\n");
+    let encodedUri = encodeURI(csvContent);
+    let link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "exported_data.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+});
+
 
         const chartConfigs = [
             { id: 'barChart', type: 'bar' },

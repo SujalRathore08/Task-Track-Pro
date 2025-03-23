@@ -3,6 +3,7 @@
     await Html.RenderPartialAsync("_ValidationScriptsPartial");
 }
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <div class="login-bg-wrapper d-flex flex-column">
     <div class="login-logo-header d-flex align-items-center bg-danger">
@@ -208,23 +209,37 @@
             }
 
             $.ajax({
-                url: 'http://localhost:5136/api/UserApi/Register',
-                type: 'POST',
-                data: formData,
-                contentType: false,
-                processData: false,
-                success: function (response) {
-                    // Show Kendo Notification on Success
-                    notification.show({ message: "User registered successfully!" }, "success");
-                    clearData();
-                    setTimeout(() => {
-                        window.location = '../Home/Login';
-                    }, 2000);
-                },
-                error: function (xhr, status) {
-                    console.error("Error while adding the user: " + xhr.responseText);
-                }
-            });
+    url: 'http://localhost:5136/api/UserApi/Register',
+    type: 'POST',
+    data: formData,
+    contentType: false,
+    processData: false,
+    success: function (response) {
+        // Show Swal alert on success
+        Swal.fire({
+            title: "Success!",
+            text: "User registered successfully!",
+            icon: "success",
+            confirmButtonText: "OK",
+            timer: 2000
+        }).then(() => {
+            // Redirect to Login page after Swal alert
+            window.location = '../Home/Login';
+        });
+
+        // Clear form data
+        clearData();
+    },
+    error: function (xhr, status) {
+        console.error("Error while adding the user: " + xhr.responseText);
+        Swal.fire({
+            title: "Error!",
+            text: "User registration failed. Please try again.",
+            icon: "error",
+            confirmButtonText: "OK"
+        });
+    }
+});
         };
 
         function clearData() {
