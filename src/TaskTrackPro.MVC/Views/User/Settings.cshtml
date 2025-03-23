@@ -18,9 +18,8 @@
     <div class="card shadow p-4">
         <h3 class="text-center">Update Profile</h3>
         <form id="updateProfileForm">
-            @* <input type="text" id="userIdEdit"> *@
             <div class="mb-3">
-                <label for="username" class="form-label">Username</label>
+                <label for="usernameEdit" class="form-label">Username</label>
                 <input type="text" class="form-control" id="usernameEdit" name="c_uname" required>
             </div>
             <div class="mb-3">
@@ -38,11 +37,11 @@
             </div>
             <div class="mb-3">
                 <label for="profilePicture" class="form-label">Profile Picture</label>
-                <input type="file" class="form-control" id="profilePicture" name="profile_image">
+                <input type="file" class="form-control" id="profilePicture" name="c_newProfilepicture">
                 <img id="previewImage" src="" alt="Profile Picture" class="img-thumbnail mt-2" style="max-width: 100px; display: none;">
             </div>
             <input type="hidden" id="userId" name="c_uid">
-            <input type="hidden" id="oldProfilePic" name="old_profile_picture">
+            <input type="hidden" id="oldProfilePic" name="c_profilepicture">
             <div class="text-center">
                 <button type="submit" class="btn btn-primary">Update Profile</button>
             </div>
@@ -51,9 +50,8 @@
         <div id="successMessage" class="alert alert-success mt-3 d-none"></div>
         <div id="errorMessage" class="alert alert-danger mt-3 d-none"></div>
     </div>
-</div>
 
-<div class="container mt-4">
+    <div class="container mt-4">
     <h2>Change Password</h2>
     <div class="alert alert-success d-none" id="successMessage">Password updated successfully!</div>
     <div class="alert alert-danger d-none" id="errorMessage"></div>
@@ -70,6 +68,8 @@
         <button type="submit" class="btn btn-primary">Update Password</button>
     </form>
 </div>
+</div>
+
 
 <script>
     $(document).ready(function () {
@@ -149,44 +149,43 @@
         }
 
         // Handle form submission
-        $("#updateProfileForm").submit(function (e) {
-            e.preventDefault();
+ $("#updateProfileForm").submit(function (e) {
+    e.preventDefault();
 
-            var formData = new FormData();
-            formData.append("c_uname", $("#usernameEdit").val());
-            formData.append("c_email", $("#email").val());
-            formData.append("c_gender", $("#gender").val());
-            formData.append("c_uid",$("#userIdEdit").val());
+    var formData = new FormData();
+    formData.append("c_uname", $("#usernameEdit").val());
+    formData.append("c_email", $("#email").val());
+    formData.append("c_gender", $("#gender").val());
+    formData.append("c_uid", $("#userId").val());
 
-            console.log($("#userIdEdit").val());
+    var profilePic = $("#profilePicture")[0].files[0];
+
+    if (profilePic) {
+        formData.append("c_newProfilepicture", profilePic); // Send new image if selected
+    } else {
+        formData.append("c_newProfilepicture", ""); // Send an empty string to satisfy validation
+    }
+
+    formData.append("c_profilepicture", $("#oldProfilePic").val()); // Send existing image filename
+
+    $.ajax({
+        url: "http://localhost:5136/api/UserApi/ProfileUpdate",
+        type: "PUT",
+        processData: false,
+        contentType: false,
+        data: formData,
+        success: function (response) {
+            $("#successMessage").removeClass("d-none").text("Profile updated successfully!");
+            $("#errorMessage").addClass("d-none");
+        },
+        error: function (xhr) {
+            $("#errorMessage").removeClass("d-none").text(xhr.responseText);
+            $("#successMessage").addClass("d-none");
+        }
+    });
+});
 
 
-            // Handle profile picture upload
-            var profilePic = $("#profilePicture")[0].files[0];
-            if (profilePic) {
-                formData.append("c_profilepicture", profilePic);
-            } else {
-                formData.append("c_profilepicture", $("#oldProfilePic").val()); // Send existing image URL
-            }
-
-            $.ajax({
-                url: "http://localhost:5136/api/UserApi/UpdateProfile", // Update API URL
-                type: "PUT",
-                processData: false,
-                contentType: false,
-                data: formData,
-                success: function (response) {
-                    console.log(response)
-                    $("#successMessage").removeClass("d-none").text("Profile updated successfully!");
-                    $("#errorMessage").addClass("d-none");
-                },
-                error: function (error,xhr) {
-                    console.log(error)
-                    $("#errorMessage").removeClass("d-none").text(xhr.responseText);
-                    $("#successMessage").addClass("d-none");
-                }
-            });
-        });
 
         // Preview selected profile picture
         $("#profilePicture").change(function (event) {

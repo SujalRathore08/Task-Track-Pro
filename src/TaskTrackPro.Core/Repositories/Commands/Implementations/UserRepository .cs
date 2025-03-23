@@ -258,5 +258,28 @@ namespace TaskTrackPro.Core.Repositories.Commands.Implementations
         return 0;
     }
 
+     
+     public async Task<int> ProfileUpdate(t_UpdateProfile userData)
+     {
+        var qry = "UPDATE t_user_task SET c_profilepicture=@c_profilepicture WHERE c_uid = @c_uid";
+        try
+        {
+            using (NpgsqlCommand cmd = new NpgsqlCommand(qry, _conn))
+            {
+                _conn.Close();
+                cmd.Parameters.AddWithValue("@c_profilepicture", userData.c_profilepicture);
+                cmd.Parameters.AddWithValue("@c_uid", userData.u_id);
+                _conn.Open();
+                int rowsAffected = await cmd.ExecuteNonQueryAsync();
+                return 1;
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error updating profile: " + e.Message);
+        }
+        return 0;   
+     }
+
     }
 }

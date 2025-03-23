@@ -229,7 +229,7 @@ namespace TaskTrackPro.API.Controllers
             user.c_password = BCrypt.Net.BCrypt.HashPassword(model.NewPassword);
             var status = await _user.ChangePassword(user);
 
-            if (status > 0)
+              if (status != null && status > 0)
                 return Ok(new { success = true, message = "Password changed successfully" });
 
             return BadRequest(new { success = false, message = "Error changing password" });
@@ -255,10 +255,8 @@ namespace TaskTrackPro.API.Controllers
                 var filePath = Path.Combine("../TaskTrackPro.MVC/wwwroot/profile_images", fileName);
                 model.c_profilepicture = fileName;
 
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await model.c_profile.CopyToAsync(stream);
-                }
+                await using var stream = new FileStream(filePath, FileMode.Create);
+                await model.c_profile.CopyToAsync(stream);
             }
 
             var status = await _user.UpdateProfile(model);
@@ -267,6 +265,32 @@ namespace TaskTrackPro.API.Controllers
                 return Ok(new { success = true, message = "Profile updated successfully" });
 
             return BadRequest(new { success = false, message = "Error updating profile" });
+        }
+
+        [HttpPut]
+        [Route("ProfileUpdate")]
+        public async Task<IActionResult> ProfileUpdate([FromForm] t_UpdateProfile model)
+        {
+            var userId = HttpContext.Session.GetInt32("c_uid");
+            // if (!userId.HasValue) return Unauthorized(new { success = false, message = "User not logged in." });
+
+            if (model.c_profile != null && model.c_profile.Length > 0)
+            {
+                var fileName = model.c_profile.FileName;
+                var filePath = Path.Combine("../TaskTrackPro.MVC/wwwroot/profile_images", fileName);
+                model.c_profilepicture = fileName;
+
+                await using var stream = new FileStream(filePath, FileMode.Create);
+                await model.c_profile.CopyToAsync(stream);
+            }
+
+            var status = await _user.ProfileUpdate(model);
+
+            if (status != null && status > 0)
+                return Ok(new { success = true, message = "Profile updated successfully" });
+
+            return BadRequest(new { success = false, message = "Error updating profile" });
+            
         }
     }
 }
