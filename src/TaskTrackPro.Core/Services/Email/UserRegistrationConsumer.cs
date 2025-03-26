@@ -61,11 +61,77 @@ namespace TaskTrackPro.Core.Services.Email
             var email = new MimeMessage();
             email.From.Add(new MailboxAddress("TaskTrackPro", emailSettings["SenderEmail"]));
             email.To.Add(new MailboxAddress("Admin", emailSettings["AdminEmail"]));
-            email.Subject = "New User Registered";
-            email.Body = new TextPart("plain")
-            {
-                Text = $"A new user has registered:\n\nName: {userName}\nEmail: {userEmail}"
-            };
+            email.Subject = "📩 New User Registration - TaskTrackPro";
+
+            // HTML Email Body
+            string emailBody = $@"
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <style>
+                    body {{
+                        font-family: Arial, sans-serif;
+                        background-color: #f4f4f4;
+                        padding: 20px;
+                    }}
+                    .container {{
+                        max-width: 600px;
+                        background: white;
+                        padding: 20px;
+                        border-radius: 10px;
+                        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                        text-align: center;
+                    }}
+                    .header {{
+                        background-color: #007bff;
+                        color: white;
+                        padding: 10px;
+                        font-size: 20px;
+                        border-radius: 10px 10px 0 0;
+                    }}
+                    .content {{
+                        padding: 20px;
+                        font-size: 16px;
+                        color: #333;
+                    }}
+                    .footer {{
+                        background-color: #f4f4f4;
+                        padding: 10px;
+                        font-size: 14px;
+                        color: #777;
+                        border-radius: 0 0 10px 10px;
+                    }}
+                    .button {{
+                        display: inline-block;
+                        padding: 10px 20px;
+                        color: white;
+                        background-color: #28a745;
+                        text-decoration: none;
+                        border-radius: 5px;
+                        margin-top: 10px;
+                    }}
+                    @media (max-width: 600px) {{
+                        .container {{
+                            width: 100%;
+                        }}
+                    }}
+                </style>
+            </head>
+            <body>
+                <div class='container'>
+                    <div class='header'>🚀 New User Registration</div>
+                    <div class='content'>
+                        <p><strong>UserName:</strong> {userName}</p>
+                        <p><strong>Email:</strong> {userEmail}</p>
+                        <p>A new user has registered on <b>TaskTrackPro</b>. Click the button below to view details.</p>
+                        <a href='https://yourwebsite.com/admin-dashboard' class='button'>View User</a>
+                    </div>
+                    <div class='footer'>© 2025 TaskTrackPro. All Rights Reserved.</div>
+                </div>
+            </body>
+            </html>";
+
+            email.Body = new TextPart("html") { Text = emailBody };
 
             using var smtp = new MailKit.Net.Smtp.SmtpClient();
             await smtp.ConnectAsync(emailSettings["SmtpServer"], int.Parse(emailSettings["SmtpPort"]), SecureSocketOptions.StartTls);
