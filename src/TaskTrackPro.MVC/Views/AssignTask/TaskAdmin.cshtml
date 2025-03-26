@@ -11,7 +11,7 @@
     <input type="text" id="taskTitle" style="width: 300px;"/><br><br>
 
     <label>Task Description:</label>
-    <textarea id="taskDescription" rows="4" style="width: 300px;"/></textarea><br><br>
+    <textarea id="taskDescription" rows="4" style="width: 300px;"></textarea><br><br>
 
     <label>Start Date:</label>
     <input id="startDate" style="width: 300px;"/><br><br>
@@ -21,6 +21,9 @@
 </div>
 
 <button id="submitTask">Assign Task</button>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
     $(document).ready(function () {
@@ -38,28 +41,23 @@
             }
         });
 
-        $("#startDate").kendoDatePicker({
-            format: "yyyy-MM-dd"
-        });
-
-        $("#endDate").kendoDatePicker({
-            format: "yyyy-MM-dd"
-        });
+        $("#startDate").kendoDatePicker({ format: "yyyy-MM-dd" });
+        $("#endDate").kendoDatePicker({ format: "yyyy-MM-dd" });
 
         $("#submitTask").click(function () {
-            let selectedUsers = $("#userdropdown").data("kendoMultiSelect").value(); // Get selected user IDs
+            let selectedUsers = $("#userdropdown").data("kendoMultiSelect").value();
             let taskTitle = $("#taskTitle").val();
             let taskDescription = $("#taskDescription").val();
             let startDate = $("#startDate").data("kendoDatePicker").value();
             let endDate = $("#endDate").data("kendoDatePicker").value();
 
             if (selectedUsers.length === 0 || !taskTitle || !taskDescription || !startDate || !endDate) {
-                alert("Please fill all fields and select at least one user.");
+                Swal.fire("Warning", "Please fill all fields and select at least one user.", "warning");
                 return;
             }
 
             if (startDate >= endDate) {
-                alert("Start Date must be earlier than End Date.");
+                Swal.fire("Error", "Start Date must be earlier than End Date.", "error");
                 return;
             }
 
@@ -71,23 +69,27 @@
                 endDate: endDate.toISOString().split("T")[0]
             };
 
-            console.log(requestData);
-            
             $.ajax({
                 url: "http://localhost:5136/api/UserAuth/assign",
                 type: "POST",
                 contentType: "application/json",
                 data: JSON.stringify(requestData),
                 success: function (response) {
-                    alert("Task assigned successfully!");
-                    $("#userdropdown").data("kendoMultiSelect").value([]);
-                    $("#taskTitle").val("");
-                    $("#taskDescription").val("");
-                    $("#startDate").data("kendoDatePicker").value(null);
-                    $("#endDate").data("kendoDatePicker").value(null);
+                    Swal.fire({
+                        title: "Success!",
+                        text: "Task assigned successfully!",
+                        icon: "success",
+                        confirmButtonText: "OK"
+                    }).then(() => {
+                        $("#userdropdown").data("kendoMultiSelect").value([]);
+                        $("#taskTitle").val("");
+                        $("#taskDescription").val("");
+                        $("#startDate").data("kendoDatePicker").value(null);
+                        $("#endDate").data("kendoDatePicker").value(null);
+                    });
                 },
                 error: function (error) {
-                    alert("Error assigning task!");
+                    Swal.fire("Error", "Error assigning task!", "error");
                     console.error(error);
                 }
             });

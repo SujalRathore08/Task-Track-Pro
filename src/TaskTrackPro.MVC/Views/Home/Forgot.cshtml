@@ -1,0 +1,121 @@
+@{
+    Layout = "_AuthLayout";
+}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- SweetAlert2 -->
+<div class="login-bg-wrapper d-flex flex-column">
+    <div class="login-logo-header d-flex align-items-center">
+        <a href="#" class="login-logo-wrapper">
+            <img src="~/css/Default/images/TaskTrackPro.png" class="login-logo-img" alt="TaskTrackPro" />
+        </a>
+        <span class="separator"></span>
+        <span class="login-branh-text">TaskTrackPro</span>
+    </div>
+    <div class="login-graphic-wrapper flex-1 overflow-auto d-flex flex-wrap">
+        <div class="login-left-wrapper">
+            <div>
+                <img src="~/css/Default/images/LogoImage.png" alt="TaskTrackPro" class="login-graphice-img" />
+                <p class="login-graphice-text">Reset your password securely and regain access to your account.</p>
+            </div>
+        </div>
+        <div class="login-right-wrapper">
+            <div class="loginpage-box-wrapper">
+                <h2 class="login-title text-dark font-bold">Forgot Password</h2>
+                <div class="loginpage-box-content">
+                    <form id="forgotPasswordForm">
+                        <div class="form-group">
+                            <input type="email" class="k-textbox login-textbox" placeholder="Enter your email"
+                                id="forgotEmail" required>
+                            <span class="login-textbox-icon"><i class="icon-email"></i></span>
+                        </div>
+                        <div class="form-group pb-10">
+                            <button type="button" class="btn btn-primary k-button w100" id="sendOtp">Send OTP</button>
+                        </div>
+                        <div id="otpSection" style="display: none;">
+                            <div class="form-group">
+                                <input type="text" class="k-textbox login-textbox" placeholder="Enter OTP"
+                                    id="otpInput">
+                                <span class="login-textbox-icon"><i class="icon-key"></i></span>
+                            </div>
+                            <div class="form-group pb-10">
+                                <button type="button" class="btn btn-primary k-button w100" id="verifyOtp">Verify
+                                    OTP</button>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="text-center">
+                        <a asp-action="Login" class="forgot-pwd btn-link-trans font-medium text-dark text-primary">Back
+                            to Login</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#sendOtp').click(function () {
+            var email = $('#forgotEmail').val();
+            if (email) {
+                $.ajax({
+                    url: 'http://localhost:5136/api/Account/SendOtp',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ email: email }),
+                    success: function (data) {
+                        if (data.success) {
+                            Swal.fire({
+                                title: "OTP Sent!",
+                                text: "Check your email for the OTP.",
+                                icon: "success",
+                                confirmButtonText: "OK"
+                            }).then(() => {
+                                $('#otpSection').show();
+                            });
+                        } else {
+                            Swal.fire("Error", "Failed to send OTP. Please try again.", "error");
+                        }
+                    },
+                    error: function () {
+                        Swal.fire("Error", "An error occurred. Please try again.", "error");
+                    }
+                });
+            } else {
+                Swal.fire("Warning", "Please enter your email.", "warning");
+            }
+        });
+
+        $('#verifyOtp').click(function () {
+            var email = $('#forgotEmail').val();
+            var otp = $('#otpInput').val();
+            if (email && otp) {
+                $.ajax({
+                    url: 'http://localhost:5136/api/Account/VerifyOtp',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ email: email, otp: otp }),
+                    success: function (data) {
+                        if (data.success) {
+                            Swal.fire({
+                                title: "OTP Verified!",
+                                text: "You can now reset your password.",
+                                icon: "success",
+                                confirmButtonText: "Proceed"
+                            }).then(() => {
+                                window.location.href = '/Home/ResetPassword';
+                            });
+                        } else {
+                            Swal.fire("Error", "Invalid OTP. Please try again.", "error");
+                        }
+                    },
+                    error: function () {
+                        Swal.fire("Error", "An error occurred. Please try again.", "error");
+                    }
+                });
+            } else {
+                Swal.fire("Warning", "Please enter the OTP.", "warning");
+            }
+        });
+    });
+</script>

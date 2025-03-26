@@ -1,5 +1,5 @@
 ﻿@{
-    Layout="_AuthLayout";
+    Layout = "_AuthLayout";
 }
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <div class="login-bg-wrapper d-flex flex-column">
@@ -12,8 +12,6 @@
         <div class="login-left-wrapper">
             <div>
                 <img src="~/css/Default/images/Login_Graphics.svg" alt="TaskTrackPro" class="login-graphice-img" />
-                @* <p class="login-graphice-text">Keep Your Agile Ceremonies Effective and provide a seamless cycle of
-                    successful sprints</p> *@
             </div>
         </div>
         <div class="login-right-wrapper">
@@ -41,6 +39,11 @@
                     <div class="form-group pb-10">
                         <button type="submit" class="btn btn-primary k-button w100 loginbtn" id="submit">Log In</button>
                     </div>
+                    <div class="text-center">
+                        <span class="text-dark font-medium">Forgot Password?</span>
+                        <a asp-action="Forgot" class="forgot-pwd btn-link-trans font-medium text-dark text-primary"
+                            aria-label="Forgot password">click here</a>
+                    </div>
                     <p id="message" class="text-center text-danger"></p>
                     <div class="text-center">
                         <span class="text-dark font-medium">Don't Have an account?</span>
@@ -56,8 +59,7 @@
 <!-- Load Necessary Scripts -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
-<!--  Fix Validation Issue -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script> <!--  SignalR -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script> <!-- SignalR -->
 
 <script>
     $(document).ready(function () {
@@ -85,7 +87,8 @@
             var formData = new FormData();
             formData.append("c_email", email);
             formData.append("c_password", password);
-            formData.append("c_role", role)
+            formData.append("c_role", role);
+
             $.ajax({
                 url: "http://localhost:5136/api/UserApi/Login", // API Endpoint
                 type: "POST",
@@ -93,42 +96,70 @@
                 contentType: false,
                 data: formData,
                 success: function (response) {
-                        var userdata = JSON.stringify(response.data)
+                    var userdata = JSON.stringify(response.data);
                     if (response.success) {
-                        sessionStorage.setItem("userEmail", email); //  Store email for SignalR chat
-                        $("#message").text(response.message).css("color", "green");
+                        sessionStorage.setItem("userEmail", email); // Store email for SignalR chat
+                        sessionStorage.setItem("User", userdata);
+
+                        // SweetAlert2 Success Message
+                        Swal.fire({
+                            title: "Login Successful!",
+                            text: response.message,
+                            icon: "success",
+                            confirmButtonText: "Continue"
+                        }).then(() => {
+                            // Redirect based on role after user clicks "Continue"
+                            if (response.role == "Admin") {
+                                window.location.href = "/Admin/Index";
+                            } else {
+                                window.location.href = "/User/Task";
+                            }
+                        });
 
                         // Connect to SignalR after successful login
                         connectToSignalR(email);
-                        if (response.role == "Admin") {
-                            window.location.href = "/Admin/Index"
-                        }
-                        else {
-                            window.location.href = "/User/Task"
-                            sessionStorage.setItem("User",userdata)
-                        }
-                    } 
-                    else {
-                        $("#message").text(response.message).css("color", "green");
+                    } else {
+                        // Show error message using SweetAlert2
+                        Swal.fire({
+                            title: "Login Failed!",
+                            text: response.message,
+                            icon: "error",
+                            confirmButtonText: "Try Again"
+                        });
                     }
                 },
                 error: function (xhr) {
                     console.log(xhr.responseText);
-                    $("#message").text("User Not Authorized! Wait Until Admin Not Approved").css("color", "red");
+                    Swal.fire({
+                        title: "User Not Authorized!",
+                        text: "Wait until Admin approves your account.",
+                        icon: "warning",
+                        confirmButtonText: "Okay"
+                    });
                 }
             });
         }
 
         function connectToSignalR(userEmail) {
             let connection = new signalR.HubConnectionBuilder()
-                .withUrl("http://localhost:5136/chatHub") //  ChatHub URL
+                .withUrl("http://localhost:5136/chatHub") // ChatHub URL
                 .configureLogging(signalR.LogLevel.Information)
                 .build();
 
             // Handle real-time messages
             connection.on("ReceiveMessage", function (sender, message) {
                 console.log("New message from " + sender + ": " + message);
-                alert("New message from " + sender + ": " + message); // Replace with chat UI update
+
+                // Show real-time message in SweetAlert2 instead of alert
+                Swal.fire({
+                    title: "New Message",
+                    text: `From ${sender}: ${message}`,
+                    icon: "info",
+                    toast: true,
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 3000
+                });
             });
 
             // Start the connection

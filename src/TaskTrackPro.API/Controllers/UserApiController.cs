@@ -71,49 +71,6 @@ namespace TaskTrackPro.API.Controllers
             }
         }
 
-        // [HttpPost("login")]
-        // public async Task<IActionResult> Login([FromForm] Login loginData)
-        // {
-        //     if (!ModelState.IsValid)
-        //     {
-        //         var errors = ModelState.Where(e => e.Value.Errors.Count > 0)
-        //             .ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Errors.Select(err => err.ErrorMessage).ToArray());
-
-        //         return BadRequest(new { success = false, message = errors });
-        //     }
-
-        //     try
-        //     {
-        //         if (loginData.c_role == "Admin")
-        //         {
-        //             if (loginData.c_email == "ritadehrawala3@gmail.com" && loginData.c_password == "admin@123")
-        //             {
-        //                 return Ok(new { success = true, message = "Login Success", role = loginData.c_role });
-        //             }
-        //             else
-        //             {
-        //                 return BadRequest(new { success = false, message = "Invalid Credentials" });
-        //             }
-        //         }
-        //         var userData = await _user.Login(loginData);
-        //         if (userData.c_uid == 0)
-        //         {
-        //             return Ok(new { success = false, message = "Invalid email or password" });
-        //         }
-
-        //         HttpContext.Session.SetInt32("userid", userData.c_uid);
-        //         HttpContext.Session.SetString("UserQueue", userData.c_email);
-        //         _redis.SetAdd("online_users", userData.c_email);
-
-        //         return Ok(new { success = true, message = "Login successful", UserData = userData });
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         _logger.LogError(ex, "Error occurred during user login.");
-        //         return StatusCode(500, new { success = false, message = "An unexpected error occurred. Please try again later." });
-        //     }
-        // }
-
         [HttpPost]
         [Route("Login")]
         public async Task<IActionResult> Login([FromForm] Login user)
@@ -140,7 +97,7 @@ namespace TaskTrackPro.API.Controllers
 
                 // 🔹 Fetch user from DB
                 var data = await _user.Login(user);
-
+                
                 // 🔹 Ensure user exists before accessing properties
                 if (data == null)
                 {
