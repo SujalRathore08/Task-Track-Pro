@@ -35,8 +35,8 @@
                             <span class="login-textbox-icon"><i class="icon-email"></i></span>
                         </div>
                         <div class="form-group animate-slide-in">
-                            <input type="password" class="k-textbox login-textbox" placeholder="Password" id="loginPassword"
-                                name="loginPassword">
+                            <input type="password" class="k-textbox login-textbox" placeholder="Password"
+                                id="loginPassword" name="loginPassword">
                             <span class="login-textbox-icon"><i class="icon-locked"></i></span>
                         </div>
                         <div class="form-group pb-10 animate-slide-in">
@@ -122,27 +122,39 @@
         });
 
         function loginUser() {
-            var formData = {
-                role: $('#role').val(),
-                email: $('#loginEmail').val(),
-                password: $('#loginPassword').val()
-            };
-
+            let formData = new FormData();
+            formData.append("c_email", $('#loginEmail').val().trim());
+            formData.append("c_password", $('#loginPassword').val().trim())
+            formData.append("c_role", $('#role').val())
             $.ajax({
                 url: 'http://localhost:5136/api/UserApi/Login',
                 type: 'POST',
-                data: JSON.stringify(formData),
-                contentType: 'application/json',
+                contentType: false,
+                processData: false,
+                data: formData,
                 success: function (response) {
-                    Swal.fire({
-                        title: "Success!",
-                        text: "Login successful!",
-                        icon: "success",
-                        confirmButtonText: "OK",
-                        timer: 2000
-                    }).then(() => {
-                        window.location = '../Dashboard';
-                    });
+                    if (response.c_role == "Admin") {
+                        Swal.fire({
+                            title: "Success!",
+                            text: "Login successful!",
+                            icon: "success",
+                            confirmButtonText: "OK",
+                            timer: 2000
+                        }).then(() => {
+                            window.location = '../AssignTask/ChatPage';
+                        });
+                    }
+                    else {
+                        Swal.fire({
+                            title: "Success!",
+                            text: "Login successful!",
+                            icon: "success",
+                            confirmButtonText: "OK",
+                            timer: 2000
+                        }).then(() => {
+                            window.location = '../User/Task';
+                        });
+                    }
                 },
                 error: function (xhr) {
                     Swal.fire({

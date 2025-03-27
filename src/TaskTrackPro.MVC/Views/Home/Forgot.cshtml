@@ -5,6 +5,14 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
+    .animate-fade-in {
+        animation: fadeIn 1s ease-in-out;
+    }
+
+    .animate-slide-in {
+        animation: slideIn 1s ease-in-out;
+    }
+
     /* Forgot Password Page Styles */
     .forgot-password-container {
         display: flex;
@@ -14,7 +22,7 @@
         padding: 20px;
         background: #f8f9fa;
     }
-    
+
     .forgot-password-box {
         background: white;
         padding: 30px;
@@ -42,7 +50,7 @@
     .login-textbox {
         width: 100%;
         padding: 12px;
-        border: 2px solid #007bff;
+        border: solid 1px #dcdfe5;
         border-radius: 8px;
         font-size: 16px;
         outline: none;
@@ -50,14 +58,16 @@
     }
 
     .login-textbox:focus {
-        border-color: #0056b3;
-        box-shadow: 0px 0px 5px rgba(0, 91, 187, 0.5);
+        @* border-color: #0056b3; *@
+        @* box-shadow: 0px 0px 5px rgba(0, 91, 187, 0.5); *@
     }
 
     .login-textbox-icon {
         position: absolute;
         right: 15px;
+        top: 50%;
         top: 0;
+        margin-top: 1.6rem;
         transform: translateY(-50%);
         color: #007bff;
     }
@@ -98,21 +108,32 @@
         text-decoration: underline;
     }
 
-    /* Animations */
     @@keyframes fadeIn {
         from {
             opacity: 0;
-            transform: translateY(-20px);
         }
 
         to {
             opacity: 1;
-            transform: translateY(0);
         }
     }
-    .login-graphice-img{
+
+    @@keyframes slideIn {
+        from {
+            transform: translateY(-20px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .login-graphice-img {
         height: 34rem;
     }
+
     /* Responsive Design */
     @@media (max-width: 768px) {
         .forgot-password-box {
@@ -142,8 +163,8 @@
                 <form class="scrollable-form" id="forgotPasswordForm">
                     <div class="loginpage-box-content">
                         <div class="form-group animate-slide-in">
-                                <input type="email" class="login-textbox" placeholder="Enter your email"
-                                    id="forgotEmail" required>
+                            <input type="email" class="login-textbox" placeholder="Enter your email" id="forgotEmail"
+                                required>
                             <span class="login-textbox-icon"><i class="icon-email"></i></span>
                         </div>
                         <div class="form-group animate-slide-in">
@@ -180,7 +201,7 @@
             formData.append("Email", email);
             if (email) {
                 $.ajax({
-                    url: 'http://localhost:5086/api/AuthApi/SendOtp',
+                    url: 'http://localhost:5136/api/Account/SendOtp',
                     type: 'POST',
                     data: formData,
                     contentType: false,
@@ -204,14 +225,14 @@
         });
 
         $('#verifyOtp').click(function () {
-            var email = $('#forgotEmail').val();
-            var otp = $('#otpInput').val();
+            var email = $('#forgotEmail').val().trim();
+            var otp = $('#otpInput').val().trim();
             let formData = new FormData();
             formData.append("Email", email);
             formData.append("Otp", otp);
             if (email && otp) {
                 $.ajax({
-                    url: 'http://localhost:5086/api/AuthApi/VerifyOtp',
+                    url: 'http://localhost:5136/api/Account/VerifyOtp',
                     type: 'POST',
                     data: formData,
                     contentType: false,
@@ -219,7 +240,7 @@
                     success: function (data) {
                         if (data.success) {
                             Swal.fire("OTP Verified!", "You can now reset your password.", "success").then(() => {
-                                window.location.href = '/Auth/ResetPassword';
+                                window.location.href = '/Home/ResetPassword';
                             });
                         } else {
                             Swal.fire("Error", "Invalid OTP. Please try again.", "error");

@@ -28,7 +28,7 @@ namespace TaskTrackPro.API.Controllers
         }
 
         [HttpPost("SendOtp")]
-        public async Task<IActionResult> SendOtp([FromBody] OtpRequest request)
+        public async Task<IActionResult> SendOtp([FromForm] OtpRequest request)
         {
             if (string.IsNullOrEmpty(request.Email))
             {
@@ -89,7 +89,7 @@ namespace TaskTrackPro.API.Controllers
         }
 
         [HttpPost("VerifyOtp")]
-        public async Task<IActionResult> VerifyOtp([FromBody] OtpVerificationRequest request)
+        public async Task<IActionResult> VerifyOtp([FromForm] OtpVerificationRequest request)
         {
             if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Otp))
             {
