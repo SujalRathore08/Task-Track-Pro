@@ -18,7 +18,7 @@
         </div>
         <div class="login-right-wrapper animate-slide-in">
             <div class="loginpage-box-wrapper animate-slide-in">
-                <h2 class="login-title text-dark font-bold animate-fade-in">Sign In</h2>
+                <h2 class="login-title text-dark font-bold animate-fade-in">Log In</h2>
                 <form class="scrollable-form" id="loginForm">
                     <div class="loginpage-box-content">
                         <div class="form-group animate-slide-in">
@@ -98,6 +98,17 @@
         }
     }
 
+    .k-button {
+        border-radius: 8px;
+    }
+
+    #loginPassword,
+    #loginEmail,
+    #role {
+        border: solid 1px #dcdfe5;
+        border-radius: 8px;
+    }
+
     .error {
         color: red !important;
         font-size: 14px;
@@ -133,18 +144,37 @@
                 processData: false,
                 data: formData,
                 success: function (response) {
-                    if (response.c_role == "Admin") {
-                        Swal.fire({
-                            title: "Success!",
-                            text: "Login successful!",
-                            icon: "success",
-                            confirmButtonText: "OK",
-                            timer: 2000
-                        }).then(() => {
-                            window.location = '../AssignTask/ChatPage';
-                        });
+                    console.log(response);
+                    sessionStorage.setItem("userEmail", $('#loginEmail').val().trim());
+                    @* sessionStorage.setItem("userId", response.data.c_uid); *@
+                        @* console.log(response.data.c_uid); *@
+                        @* sessionStorage.setItem("User", JSON.stringify(response.data)); *@
+                        console.log(response);
+                    if (response.role == "Admin") {
+                        if (response.success) {
+                            Swal.fire({
+                                title: "Success!",
+                                text: "Login successful!",
+                                icon: "success",
+                                confirmButtonText: "OK",
+                                timer: 2000
+                            }).then(() => {
+                                window.location = '../Admin/Index';
+                            });
+                        }
+                        else {
+                            Swal.fire({
+                                title: "Error!",
+                                text: "Invalid Credentials",
+                                icon: "error",
+                                confirmButtonText: "OK"
+                            });
+                        }
                     }
                     else {
+                        console.log(response.data.c_uid);
+                        sessionStorage.setItem("User", JSON.stringify(response.data));
+                        sessionStorage.setItem("userId", response.data.c_uid);
                         Swal.fire({
                             title: "Success!",
                             text: "Login successful!",
@@ -159,7 +189,7 @@
                 error: function (xhr) {
                     Swal.fire({
                         title: "Error!",
-                        text: "Invalid credentials. Please try again.",
+                        text: "Invalid Credentials or You are not approved by Admin",
                         icon: "error",
                         confirmButtonText: "OK"
                     });

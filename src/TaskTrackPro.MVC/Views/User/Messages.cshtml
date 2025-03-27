@@ -35,7 +35,8 @@
 <!-- SignalR & jQuery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
+<!-- SweetAlert Script -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     $(document).ready(function () {
         let userId = sessionStorage.getItem("userEmail");
@@ -172,6 +173,7 @@
                             usersDropdown.append(`<option value="${user.Email}">${user.Email}</option>`);
                         }
                     });
+                    usersDropdown.append(`<option value="ritadehrawala3@gmail.com">ritadehrawala3@gmail.com</option>`);
                 },
                 error: function (xhr, status, error) {
                     console.error("Failed to load users. Error:", error);
@@ -200,6 +202,7 @@
                 }
             });
         };
+
         $("#users").change(function () {
             otherUserId = $(this).val();
             loadMessages();
@@ -275,24 +278,47 @@
     }
 </style>
 <script>
-    $(document).ready(function () {
-        $("#logout").on("click", function () {
-            let email = sessionStorage.getItem("userEmail");
-            console.log("Logout email:- " + email);
-            $.ajax({
-                url: "http://localhost:5136/api/UserApi/logout?userEmail=" + email,
-                type: "POST",
-                processData: false,
-                contentType: false,
-                success: function (response) {
-                    @* if (response.success) { *@
-                        window.location.href = "../Home/Login"
-                    @* } *@
+    // Logout Functionality with SweetAlert
+    $("#logout").on("click", function () {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You will be logged out from your session!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#6c757d",
+            confirmButtonText: "Yes, Logout"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let email = sessionStorage.getItem("userEmail");
+                console.log("Logging out user: " + email);
+                $.ajax({
+                    url: "http://localhost:5136/api/UserApi/logout?userEmail=" + email,
+                    type: "POST",
+                    processData: false,
+                    contentType: false,
+                    success: function () {
+                        Swal.fire({
+                            title: "Logged Out!",
+                            text: "You have been successfully logged out.",
+                            icon: "success",
+                            confirmButtonText: "OK",
+                            confirmButtonColor: "#007bff"
+                        }).then(() => {
+                            window.location.href = "../Home/Login";
+                        });
                     },
-                error: function (xhr, status, error) {
-                    console.error("Failed to logout. Error:", error);
-                }
-            })
-        })
-    })
+                    error: function (xhr, status, error) {
+                        Swal.fire({
+                            title: "Logout Failed!",
+                            text: "Something went wrong. Please try again.",
+                            icon: "error",
+                            confirmButtonText: "Retry",
+                            confirmButtonColor: "#d33"
+                        });
+                    }
+                });
+            }
+        });
+    });
 </script>

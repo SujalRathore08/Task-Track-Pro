@@ -9,6 +9,7 @@ namespace TaskTrackPro.Core.Models
 {
     public class t_UserUpdate
     {
+        [Required]
         public int c_uid { get; set; }
         [Required]
         public string c_uname { get; set; }

@@ -15,8 +15,6 @@ namespace TaskTrackPro.Core.Repositories.Commands.Interfaces
         Task<int> UpdateProfile(t_UserUpdate userData);
         Task<t_User> GetUserByEmail(string email);
         Task<List<t_User>> LoadUsers();
-
         Task<int> ProfileUpdate(t_UpdateProfile userData);
-
     }
 }

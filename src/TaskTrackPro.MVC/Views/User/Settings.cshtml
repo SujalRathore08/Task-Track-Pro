@@ -5,15 +5,14 @@
 <!-- Menu Section-->
 <section class="main-section-menu bg-light bb-1">
     <ul class="main-section-menu-ul" id="mainSectionMenu">
-        <li><a asp-action="Task" id="iAuditInspection" class="ms-menu-link ">Task</a></li>
-        <li><a asp-action="Messages" id="iAuditAnalytics" class="ms-menu-link">Messages</a></li>
-        <li><a asp-action="Settings" id="iAuditAnalytics" class="ms-menu-link active">Settings</a></li>
-        <li><a asp-action="Password" id="iAuditAnalytics" class="ms-menu-link ">Change Password</a></li>
+        <li><a asp-action="Task" id="menuTask" class="ms-menu-link">Task</a></li>
+        <li><a asp-action="Messages" id="menuMessages" class="ms-menu-link">Messages</a></li>
+        <li><a asp-action="Settings" id="menuSettings" class="ms-menu-link active">Settings</a></li>
+        <li><a asp-action="Password" id="menuChangePassword" class="ms-menu-link">Change Password</a></li>
         <li><a id="logout" class="ms-menu-link">Logout</a></li>
     </ul>
 </section>
 <!--// Menu Section-->
-
 
 <div class="container mt-5">
     <div class="card shadow p-4">
@@ -25,7 +24,7 @@
             </div>
             <div class="mb-3">
                 <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" name="c_email" required>
+                <input type="email" class="form-control" id="email" name="c_email" required disabled>
             </div>
             <div class="mb-3">
                 <label for="gender" class="form-label">Gender</label>
@@ -48,47 +47,49 @@
                 <button type="submit" class="btn btn-primary">Update Profile</button>
             </div>
         </form>
-
-        <div id="successMessage" class="alert alert-success mt-3 d-none"></div>
-        <div id="errorMessage" class="alert alert-danger mt-3 d-none"></div>
     </div>
 </div>
 
+<!-- SweetAlert2 CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
+
 <script>
     $(document).ready(function () {
-        $("#logout").on("click", function () {
+        @* $("#logout").on("click", function () {
             let email = sessionStorage.getItem("userEmail");
-            console.log("Logout email:- " + email);
+            if (!email) {
+                console.warn("No user email found in session.");
+                return;
+            }
+
             $.ajax({
-                url: "http://localhost:5136/api/UserApi/logout?userEmail=" + email,
+                url: "http://localhost:5136/api/UserApi/logout?userEmail=" + encodeURIComponent(email),
                 type: "POST",
-                processData: false,
-                contentType: false,
-                success: function (response) {
-                    @* if (response.success) { *@
-                        window.location.href = "../Home/Login"
-                    @* } *@
-                    },
+                success: function () {
+                    sessionStorage.clear();
+                    window.location.href = "../Home/Login";
+                },
                 error: function (xhr, status, error) {
                     console.error("Failed to logout. Error:", error);
                 }
-            })
-        })
-    })
+            });
+        }); *@
 
-</script>
+        var userData = sessionStorage.getItem("User");
+        if (!userData) {
+            console.error("User data not found in sessionStorage.");
+            return;
+        }
 
-
-<script>
-    $(document).ready(function () {
-        var userData = JSON.parse(sessionStorage.getItem("User"));
+        userData = JSON.parse(userData);
 
         // Pre-fill user data
-        $("#usernameEdit").val(userData.Name);
-        $("#email").val(userData.Email);
-        $("#gender").val(userData.c_gender);
-        $("#userIdEdit").val(parseInt(userData.c_uid)); // Convert to int
-        $("#oldProfilePic").val(userData.c_profilepicture);
+        $("#usernameEdit").val(userData.Name || "");
+        $("#email").val(userData.Email || "");
+        $("#gender").val(userData.c_gender || "");
+        $("#userId").val(parseInt(userData.c_uid) || "");
+        $("#oldProfilePic").val(userData.c_profilepicture || "");
 
         // Show existing profile picture (if available)
         if (userData.c_profilepicture) {
@@ -106,34 +107,42 @@
             formData.append("c_uid", $("#userId").val());
 
             var profilePic = $("#profilePicture")[0].files[0];
-
             if (profilePic) {
-                formData.append("c_newProfilepicture", profilePic); // Send new image if selected
+                formData.append("c_profile", profilePic);
             } else {
-                formData.append("c_newProfilepicture", ""); // Send an empty string to satisfy validation
+                formData.append("c_profile", "");
             }
 
-            formData.append("c_profilepicture", $("#oldProfilePic").val()); // Send existing image filename
+            formData.append("c_profilepicture", $("#oldProfilePic").val());
 
             $.ajax({
-                url: "http://localhost:5136/api/UserApi/ProfileUpdate",
+                url: "http://localhost:5136/api/UserApi/UpdateProfile",
                 type: "PUT",
                 processData: false,
                 contentType: false,
                 data: formData,
                 success: function (response) {
                     console.log(response);
-                    $("#successMessage").removeClass("d-none").text("Profile updated successfully!");
-                    $("#errorMessage").addClass("d-none");
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Profile updated successfully!',
+                        text: 'Redirecting to login screen...',
+                        showConfirmButton: false, // Hides the OK button
+                        timer: 3000 // The SweetAlert2 will automatically close after 1.5 seconds
+                    }).then(() => {
+                        window.location.href = "../Home/Login"; // Redirects to login page after 1.5 seconds
+                    });
                 },
                 error: function (xhr) {
-                    $("#errorMessage").removeClass("d-none").text(xhr.responseText);
-                    $("#successMessage").addClass("d-none");
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: xhr.responseText,
+                        confirmButtonText: 'Try Again'
+                    });
                 }
             });
         });
-
-
 
         // Preview selected profile picture
         $("#profilePicture").change(function (event) {
@@ -142,6 +151,51 @@
                 $("#previewImage").attr("src", e.target.result).show();
             };
             reader.readAsDataURL(event.target.files[0]);
+        });
+    });
+</script>
+<script>
+    // Logout Functionality with SweetAlert
+    $("#logout").on("click", function () {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You will be logged out from your session!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#6c757d",
+            confirmButtonText: "Yes, Logout"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let email = sessionStorage.getItem("userEmail");
+                console.log("Logging out user: " + email);
+                $.ajax({
+                    url: "http://localhost:5136/api/UserApi/logout?userEmail=" + email,
+                    type: "POST",
+                    processData: false,
+                    contentType: false,
+                    success: function () {
+                        Swal.fire({
+                            title: "Logged Out!",
+                            text: "You have been successfully logged out.",
+                            icon: "success",
+                            confirmButtonText: "OK",
+                            confirmButtonColor: "#007bff"
+                        }).then(() => {
+                            window.location.href = "../Home/Login";
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        Swal.fire({
+                            title: "Logout Failed!",
+                            text: "Something went wrong. Please try again.",
+                            icon: "error",
+                            confirmButtonText: "Retry",
+                            confirmButtonColor: "#d33"
+                        });
+                    }
+                });
+            }
         });
     });
 </script>

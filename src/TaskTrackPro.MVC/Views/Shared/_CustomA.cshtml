@@ -39,11 +39,11 @@
 <body>
     <!--Navigation Header-->
     <header class="main-header">
-        <nav class="mt-navbar">
-            <div class="nav-left" id="dvLeftMenu" data-role="aratooltipv2">
-                <div class="logo-wrapper">
-                    <img style="width: 100%;" src="~/css/Default/images/LogoImage.png" />
-                </div>
+        <nav class="mt-navbar" style="padding: 10px 20px;">
+            <div class="login-logo-header d-flex align-items-center bg-danger">
+                <a href="#" class="login-logo-wrapper">
+                    <img src="~/css/Default/images/LogoImage.png" class="login-logo-img" alt="TaskTrackPro" style="height: 2.8rem;"/>
+                </a>
             </div>
             <div class="nav-right">
                 <ul class="user-menu">
@@ -181,7 +181,7 @@
 
 
 
- 
+
 
 <script>
     var userData = JSON.parse(sessionStorage.getItem("User"))
@@ -189,7 +189,7 @@
     $('#UserEmailProfile').html(userData.Email)
     $('#UserNameProfile').html(userData.Name)
     $('#UserGenderProfile').html(userData.c_gender)
-     $("#UserProfile").attr("src", "/profile_images/"+userData.c_profilepicture)
+    $("#UserProfile").attr("src", "/profile_images/" + userData.c_profilepicture)
     function fetchNotifications() {
         $.ajax({
             url: "http://localhost:5136/api/task/notifications/" + userData.c_uid, // Replace 2 with dynamic user ID

@@ -35,7 +35,7 @@
 <!-- SignalR & jQuery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.6/dist/sweetalert2.all.min.js"></script>
 <script>
     $(document).ready(function () {
         let userId = sessionStorage.getItem("userEmail");
@@ -172,6 +172,7 @@
                             usersDropdown.append(`<option value="${user.Email}">${user.Email}</option>`);
                         }
                     });
+                    usersDropdown.append(`<option value="ritadehrawala3@gmail.com">ritadehrawala3@gmail.com</option>`);
                 },
                 error: function (xhr, status, error) {
                     console.error("Failed to load users. Error:", error);
@@ -220,7 +221,8 @@
         box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
         display: flex;
         flex-direction: column;
-        height: 500px; /* Adjust height as needed */
+        height: 500px;
+        /* Adjust height as needed */
     }
 
     .chat-box {
@@ -231,7 +233,8 @@
         padding: 10px;
         background: #fff;
         display: flex;
-        flex-direction: column-reverse; /* Ensures new messages appear at the bottom */
+        flex-direction: column-reverse;
+        /* Ensures new messages appear at the bottom */
     }
 
     .chat-input {
@@ -272,14 +275,24 @@
         color: #666;
     }
 </style>
-
 <script>
-    $(document).ready(function () {
-        $("#logout").on("click", function (e) {
-            e.preventDefault();
-            sessionStorage.clear()
-            sessionStorage.removeItem("userEmail");
-            window.location.replace("/Home/Login");
+    // Logout
+    $("#logout").on("click", function (e) {
+        e.preventDefault();
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You will be logged out!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, logout!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                sessionStorage.clear();
+                sessionStorage.removeItem("userEmail");
+                window.location.replace("/Home/Login");
+            }
         });
     });
 </script>

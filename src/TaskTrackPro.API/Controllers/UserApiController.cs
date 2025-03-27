@@ -81,7 +81,7 @@ namespace TaskTrackPro.API.Controllers
                 {
                     return BadRequest(new { message = "All Fields are Required" });
                 }
-
+                Console.WriteLine("Role: "+ user.c_role);
                 // 🔹 Admin login logic
                 if (user.c_role == "Admin")
                 {

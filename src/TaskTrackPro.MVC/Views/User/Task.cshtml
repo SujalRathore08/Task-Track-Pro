@@ -1,7 +1,6 @@
 @{
     Layout = "_Custom";
 }
-@* <link rel="stylesheet" href="~/lib/kendo/kendo.default-v2.min.css"> *@
 
 <!-- Menu Section-->
 <section class="main-section-menu bg-light bb-1">
@@ -9,47 +8,16 @@
         <li><a asp-action="Task" id="iAuditInspection" class="ms-menu-link active">Task</a></li>
         <li><a asp-action="Messages" id="iAuditAnalytics" class="ms-menu-link">Messages</a></li>
         <li><a asp-action="Settings" id="iAuditAnalytics" class="ms-menu-link">Settings</a></li>
-        <li><a asp-action="Password" id="iAuditAnalytics" class="ms-menu-link ">Change Password</a></li>
+        <li><a asp-action="Password" id="iAuditAnalytics" class="ms-menu-link">Change Password</a></li>
         <li><a id="logout" class="ms-menu-link">Logout</a></li>
     </ul>
 </section>
 <!--// Menu Section-->
 
-<div class="d-flex dashboard-wrapper justify-content-center  h100">
+<div class="d-flex dashboard-wrapper justify-content-center h100">
     <div class="dashboard-left d-flex flex-column">
-        <!-- Daily Activity -->
-        @* <div class="dashboard-daily-activity">
-            <div class="dashboard-daily-activity-wrapper ">
-                <ul class="dashboard-daily-activity-wrapper-ul justify-content-center d-flex flex-wrap">
-                    <li class="dashboard-daily-activity-item border daily-item-success">
-                        <div class="d-flex align-items-center">
-                            <span class="daily-acitivity-icon"><i class="icon-agentinfoon"></i></span>
-                            <span class="daily-acitivity-count">2</span>
-                        </div>
-                        <div class="daily-acitivity-title text-dark ellipsis">Total Task</div>
-                    </li>
-                    <li class="dashboard-daily-activity-item border daily-item-green">
-                        <div class="d-flex align-items-center">
-                            <span class="daily-acitivity-icon"><i class="icon-clock"></i></span>
-                            <span class="daily-acitivity-count">3</span>
-                        </div>
-                        <div class="daily-acitivity-title text-dark ellipsis">Pending Task</div>
-                    </li>
-                    <li class="dashboard-daily-activity-item border daily-item-brown">
-                        <div class="d-flex align-items-center">
-                            <span class="daily-acitivity-icon"><i class="icon-invite-user"></i></span>
-                            <span class="daily-acitivity-count">5</span>
-                        </div>
-                        <div class="daily-acitivity-title text-dark ellipsis">Complete Task</div>
-                    </li>
-                </ul>
-            </div>
-        </div> *@
-        <!--// Daily Activity -->
-
-
         <!-- Todo Activity -->
-        <div class="todo-inspection-activity-wrapper flex-1 ">
+        <div class="todo-inspection-activity-wrapper flex-1">
             <div class="d-flex flex-wrap dashboard-row h100">
                 <div class="todo-activity-wrapper dashboard-column-100 d-flex flex-column h100">
                     <h4 class="title font-semi-bold fs-16 text-dark pb-10">Task List</h4>
@@ -62,11 +30,10 @@
             </div>
         </div>
         <!--// Todo Activity -->
-        <!-- User an Existing Inspection Template -->
     </div>
 </div>
 
-@* Edit Task model *@
+<!-- Edit Task Modal -->
 <div id="edit-window-table">
     <div class="window-wrapper">
         <form>
@@ -98,19 +65,20 @@
             </div>
             <div class="form-group">
                 <label>Description <span class="text-muted">(Optional)</span></label>
-                <textarea disabled id="UpdatetaskDescription" class="form-control" rows="4" placeholder="Write here"
-                    title="description"></textarea>
+                <textarea disabled id="UpdatetaskDescription" class="form-control" rows="4" placeholder="Write here" title="description"></textarea>
             </div>
         </form>
     </div>
     <div class="window-footer">
-        <a class="btn btn-trans close-window">Cancel</a><a id="updateTaskBtn" class="btn btn-primary"
-            type="button">Save</a>
+        <a class="btn btn-trans close-window">Cancel</a><a id="updateTaskBtn" class="btn btn-primary" type="button">Save</a>
     </div>
 </div>
 
+<!-- SweetAlert2 CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.5/dist/sweetalert2.all.min.js"></script>
 
-@* Edit Task *@
+<!-- Kendo Window -->
 <script>
     $("#edit-window-table").kendoWindow({
         width: 450,
@@ -123,20 +91,21 @@
         ],
         modal: true
     }).data("kendoWindow");
+
     $(document).on('click', '.btn-edit-task', function () {
         $("#edit-window-table").data("kendoWindow").center().open();
     });
 </script>
-@* Change in API call *@
+
 <script>
-    var userData = JSON.parse(sessionStorage.getItem("User"))
-    console.log(userData);
+    var userId = sessionStorage.getItem("userId");
+    console.log(userId);
     $(document).ready(function () {
         // Fetch Data from API
         var taskDataSource = new kendo.data.DataSource({
             transport: {
                 read: {
-                    url: "http://localhost:5136/api/task/task?userId=" + userData.c_uid,
+                    url: "http://localhost:5136/api/task/task?userId=" + userId,
                     dataType: "json"
                 }
             },
@@ -209,14 +178,6 @@
                         $("#UpdatetaskDescription").val(dataItem.c_description);
                     }
                 });
-
-                $(".btn-edit-task").click(function () {
-                    var grid = $("#taskGrid").data("kendoGrid");
-                    var row = $(this).closest("tr");
-                    var dataItem = grid.dataItem(row);
-
-                    console.log(dataItem)
-                });
             },
             scrollable: true
         });
@@ -226,17 +187,17 @@
             dataSource: taskDataSource
         });
     });
+
     // Update Task
-    var userData = JSON.parse(sessionStorage.getItem("User"));
     $("#updateTaskBtn").click(function () {
         let updatedTask = {
             c_tid: $("#taskId").val(),
-            c_uid: parseInt(userData.c_uid) ,  // Assuming this input holds user ID
+            c_uid: parseInt(userId),
             c_task_title: $("#UpdateTaskTitle").val(),
-            c_start_date: new Date($("#Updatestartdatetimepicker").val()).toISOString(), // Convert to ISO format
+            c_start_date: new Date($("#Updatestartdatetimepicker").val()).toISOString(),
             c_end_date: new Date($("#Updateenddatetimepicker").val()).toISOString(),
             c_description: $("#UpdatetaskDescription").val(),
-            c_task_status: $("#Updatestatus").val() // Default status
+            c_task_status: $("#Updatestatus").val()
         };
 
         $.ajax({
@@ -246,35 +207,70 @@
             data: JSON.stringify(updatedTask),
             success: function (response) {
                 console.log(response);
-                alert(response.message);
-                $("#taskGrid").data("kendoGrid").dataSource.read();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Task Updated!',
+                    text: 'The task has been successfully updated.',
+                    showConfirmButton: false, // Hide OK button
+                    timer: 1500 // Close after 1.5 seconds
+                }).then(() => {
+                    $("#taskGrid").data("kendoGrid").dataSource.read();
+                    $("#edit-window-table").data("kendoWindow").close();
+                });
             },
             error: function (xhr) {
-                alert("Error updating task: " + xhr.responseText);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'An error occurred while updating the task. Please try again.',
+                    confirmButtonText: 'OK'
+                });
             }
         });
     });
 </script>
 <script>
-    $(document).ready(function () {
-        $("#logout").on("click", function () {
-            let email = sessionStorage.getItem("userEmail");
-            console.log("Logout email:- " + email);
-            $.ajax({
-                url: "http://localhost:5136/api/UserApi/logout?userEmail=" + email,
-                type: "POST",
-                processData: false,
-                contentType: false,
-                success: function (response) {
-                    @* if (response.success) { *@
-                        window.location.href = "../Home/Login"
-                    @* } *@
+    // Logout Functionality with SweetAlert
+    $("#logout").on("click", function () {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You will be logged out from your session!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#6c757d",
+            confirmButtonText: "Yes, Logout"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let email = sessionStorage.getItem("userEmail");
+                console.log("Logging out user: " + email);
+                $.ajax({
+                    url: "http://localhost:5136/api/UserApi/logout?userEmail=" + email,
+                    type: "POST",
+                    processData: false,
+                    contentType: false,
+                    success: function () {
+                        Swal.fire({
+                            title: "Logged Out!",
+                            text: "You have been successfully logged out.",
+                            icon: "success",
+                            confirmButtonText: "OK",
+                            confirmButtonColor: "#007bff"
+                        }).then(() => {
+                            window.location.href = "../Home/Login";
+                        });
                     },
-                error: function (xhr, status, error) {
-                    console.error("Failed to logout. Error:", error);
-                }
-            })
-        })
-    })
-
+                    error: function (xhr, status, error) {
+                        Swal.fire({
+                            title: "Logout Failed!",
+                            text: "Something went wrong. Please try again.",
+                            icon: "error",
+                            confirmButtonText: "Retry",
+                            confirmButtonColor: "#d33"
+                        });
+                    }
+                });
+            }
+        });
+    });
 </script>

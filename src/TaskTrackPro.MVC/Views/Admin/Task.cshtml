@@ -173,6 +173,8 @@
         <a class="btn btn-trans close-window">Cancel</a><a id="updateTaskBtn" class="btn btn-primary">Save</a>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.6/dist/sweetalert2.all.min.js"></script>
 @* Show Add Task Model *@
 <script>
     $("#task-window-table").kendoWindow({
@@ -280,13 +282,28 @@
                 contentType: "application/json",
                 data: JSON.stringify(taskData),
                 success: function (response) {
-                    alert("Task added successfully!")
-                    alert(response.message);
-                    $("#taskForm")[0].reset(); // Clear form fields
-                    $("#taskGrid").data("kendoGrid").dataSource.read(); // Refresh grid if needed
+                    $(".k-window-titlebar").css("display", "none");
+                    $(".k-header").css("display", "none");
+                    $(".delete-page").css("display", "none");
+                    $(".k-widget").css("display", "none");
+                    $(".k-window").css("display", "none");
+                    $(".k-overlay").css("display", "none");
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Task added successfully!',
+                        text: response.message
+                    }).then(function () {
+                        $("#taskForm")[0].reset();
+                        $("#taskGrid").data("kendoGrid").dataSource.read();
+                        window.location.href = "../Admin/Task"
+                    })
                 },
                 error: function (xhr) {
-                    alert("Error adding task: " + xhr.responseText);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error adding task',
+                        text: xhr.responseText
+                    });
                 }
             });
         });
@@ -298,10 +315,13 @@
                 type: "GET",
                 success: function (users) {
                     console.log(users);
-
                 },
                 error: function (xhr) {
-                    alert("Error fetching users: " + xhr.responseText);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error loading task',
+                        text: xhr.responseText
+                    });
                 }
             });
         };
@@ -322,7 +342,11 @@
                     });
                 },
                 error: function (xhr) {
-                    alert("Error fetching approved users: " + xhr.responseText);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error fetching approved users',
+                        text: xhr.responseText
+                    });
                 }
             });
         };
@@ -337,7 +361,11 @@
                     alert(response.message);
                 },
                 error: function (xhr) {
-                    alert("Error approving user: " + xhr.responseText);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error approving user:',
+                        text: xhr.responseText
+                    });
                 }
             });
         });
@@ -360,11 +388,28 @@
                 contentType: "application/json",
                 data: JSON.stringify(updatedTask),
                 success: function (response) {
-                    alert(response.message);
-                    $("#taskGrid").data("kendoGrid").dataSource.read();
+                    $(".k-window-titlebar").css("display", "none");
+                    $(".k-header").css("display", "none");
+                    $(".delete-page").css("display", "none");
+                    $(".k-widget").css("display", "none");
+                    $(".k-window").css("display", "none");
+                    $(".k-overlay").css("display", "none");
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Task updated successfully!',
+                        text: response.message
+                    }).then(function () {
+                        $("#taskForm")[0].reset();
+                        $("#taskGrid").data("kendoGrid").dataSource.read();
+                        window.location.href = "../Admin/Task"
+                    })
                 },
                 error: function (xhr) {
-                    alert("Error updating task: " + xhr.responseText);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error updating task',
+                        text: xhr.responseText
+                    });
                 }
             });
         });
@@ -376,11 +421,28 @@
                 url: apiUrl + "/delete/" + taskId,
                 type: "DELETE",
                 success: function (response) {
-                    alert(response.message);
-                    $("#taskGrid").data("kendoGrid").dataSource.read(); // Refresh grid if needed
+                    $(".k-window-titlebar").css("display", "none");
+                    $(".k-header").css("display", "none");
+                    $(".delete-page").css("display", "none");
+                    $(".k-widget").css("display", "none");
+                    $(".k-window").css("display", "none");
+                    $(".k-overlay").css("display", "none");
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Task deleted!',
+                        text: response.message
+                    }).then(function () {
+                        $("#taskForm")[0].reset();
+                        $("#taskGrid").data("kendoGrid").dataSource.read();
+                        window.location.href = "../Admin/Task"
+                    })
                 },
                 error: function (xhr) {
-                    alert("Error deleting task: " + xhr.responseText);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error deleting task',
+                        text: xhr.responseText
+                    });
                 }
             });
         });
@@ -604,12 +666,23 @@
     })
 </script>
 <script>
-    $(document).ready(function () {
-        $("#logout").on("click", function (e) {
-            e.preventDefault();
-            sessionStorage.clear()
-            sessionStorage.removeItem("userEmail");
-            window.location.replace("/Home/Login");
+    // Logout
+    $("#logout").on("click", function (e) {
+        e.preventDefault();
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You will be logged out!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, logout!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                sessionStorage.clear();
+                sessionStorage.removeItem("userEmail");
+                window.location.replace("/Home/Login");
+            }
         });
     });
 </script>

@@ -65,9 +65,9 @@
         </div>
 
         <!-- Export Data Button -->
-<div class="text-center my-3">
-    <button id="exportData" class="btn btn-primary">Export Data</button>
-</div>
+        <div class="text-center my-3">
+            <button id="exportData" class="btn btn-primary">Export Data</button>
+        </div>
 
 
         <!-- Chart Visualization -->
@@ -84,27 +84,56 @@
 
 <!-- Styles -->
 <style>
-    .charts-container {
+    body,
+    html {
+        height: 126vh;
+        overflow: auto;
+        scrollbar-width: none;
+        /* Firefox */
+        -ms-overflow-style: none;
+        /* IE and Edge */
+    }
+
+    body::-webkit-scrollbar,
+    html::-webkit-scrollbar {
+        display: none;
+        /* Hide scrollbar for Chrome, Safari */
+    }
+
+    .dashboard-wrapper {
         display: flex;
-        flex-wrap: wrap;
         justify-content: center;
-        gap: 20px;
-        padding: 20px;
+        height: 100vh;
+        overflow: auto;
+        scrollbar-width: none;
+        /* Firefox */
+        -ms-overflow-style: none;
+        /* IE and Edge */
     }
 
-    .chart-wrapper {
-        width: 350px;
-        height: 350px;
+    .dashboard-wrapper::-webkit-scrollbar {
+        display: none;
     }
 
-    canvas {
-        width: 100% !important;
-        height: 100% !important;
+    .dashboard-left {
+        overflow: auto;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        scrollbar-width: none;
+        /* Firefox */
+        -ms-overflow-style: none;
+        /* IE and Edge */
+    }
+
+    .dashboard-left::-webkit-scrollbar {
+        display: none;
     }
 </style>
 
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     $(document).ready(function () {
         let totalMembers = 0, approvedTasks = 0, pendingTasks = 0;
@@ -130,31 +159,31 @@
         }
 
         $("#exportData").on("click", function () {
-    let selected = $("#dataFilter").val();
-    let dataToExport;
+            let selected = $("#dataFilter").val();
+            let dataToExport;
 
-    if (selected === "TotalMembers") {
-        dataToExport = [["Category", "Count"], ["Total Members", totalMembers]];
-    } else if (selected === "Approved") {
-        dataToExport = [["Category", "Count"], ["Approved Tasks", approvedTasks]];
-    } else if (selected === "Pending") {
-        dataToExport = [["Category", "Count"], ["Pending Tasks", pendingTasks]];
-    } else {
-        dataToExport = [["Category", "Count"], 
-                        ["Total Members", totalMembers], 
-                        ["Approved Tasks", approvedTasks], 
-                        ["Pending Tasks", pendingTasks]];
-    }
+            if (selected === "TotalMembers") {
+                dataToExport = [["Category", "Count"], ["Total Members", totalMembers]];
+            } else if (selected === "Approved") {
+                dataToExport = [["Category", "Count"], ["Approved Tasks", approvedTasks]];
+            } else if (selected === "Pending") {
+                dataToExport = [["Category", "Count"], ["Pending Tasks", pendingTasks]];
+            } else {
+                dataToExport = [["Category", "Count"],
+                ["Total Members", totalMembers],
+                ["Approved Tasks", approvedTasks],
+                ["Pending Tasks", pendingTasks]];
+            }
 
-    let csvContent = "data:text/csv;charset=utf-8," + dataToExport.map(e => e.join(",")).join("\n");
-    let encodedUri = encodeURI(csvContent);
-    let link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "exported_data.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-});
+            let csvContent = "data:text/csv;charset=utf-8," + dataToExport.map(e => e.join(",")).join("\n");
+            let encodedUri = encodeURI(csvContent);
+            let link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "exported_data.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
 
 
         const chartConfigs = [
@@ -205,11 +234,24 @@
             chartData.datasets[0].data = newData;
             Object.values(charts).forEach(chart => chart.update());
         });
-
+        // Logout
         $("#logout").on("click", function (e) {
             e.preventDefault();
-            sessionStorage.clear();
-            window.location.replace("/Home/Login");
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You will be logged out!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, logout!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    sessionStorage.clear();
+                    sessionStorage.removeItem("userEmail");
+                    window.location.replace("/Home/Login");
+                }
+            });
         });
     });
 </script>
