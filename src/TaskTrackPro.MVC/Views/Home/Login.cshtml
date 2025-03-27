@@ -1,5 +1,6 @@
 ﻿@{
     Layout = "_AuthLayout";
+    await Html.RenderPartialAsync("_ValidationScriptsPartial");
 }
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <div class="login-bg-wrapper d-flex flex-column">
@@ -9,63 +10,103 @@
         </a>
     </div>
     <div class="login-graphic-wrapper flex-1 overflow-auto d-flex flex-wrap">
-        <div class="login-left-wrapper">
+        <div class="login-left-wrapper animate-fade-in">
             <div>
-                <img src="~/css/Default/images/Login_Graphics.svg" alt="TaskTrackPro" class="login-graphice-img" />
+                <img src="~/css/Default/images/Login_Graphics.svg" alt="TaskTrackPro"
+                    class="login-graphice-img animate-fade-in" />
             </div>
         </div>
-        <div class="login-right-wrapper">
-            <div class="loginpage-box-wrapper">
-                <h2 class="login-title text-dark font-bold">Sign In</h2>
-                <form class="loginpage-box-content" id="loginForm">
-                    <div class="form-group">
-                        <div class="custom-dropdown">
-                            <select name="role" id="role" class="form-control">
-                                <option value="Admin">Admin</option>
-                                <option value="User">User</option>
-                            </select>
+        <div class="login-right-wrapper animate-slide-in">
+            <div class="loginpage-box-wrapper animate-slide-in">
+                <h2 class="login-title text-dark font-bold animate-fade-in">Sign In</h2>
+                <form class="scrollable-form" id="loginForm">
+                    <div class="loginpage-box-content">
+                        <div class="form-group animate-slide-in">
+                            <div class="custom-dropdown">
+                                <select name="role" id="role" class="form-control">
+                                    <option value="Admin">Admin</option>
+                                    <option value="User">User</option>
+                                </select>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <input type="email" class="k-textbox login-textbox" placeholder="Email" id="loginEmail"
-                            name="loginEmail" required>
-                        <span class="login-textbox-icon"><i class="icon-email"></i></span>
-                    </div>
-                    <div class="form-group">
-                        <input type="password" class="k-textbox login-textbox" placeholder="Password" id="loginPassword"
-                            name="loginPassword" required>
-                        <span class="login-textbox-icon"><i class="icon-locked"></i></span>
-                    </div>
-                    <div class="form-group pb-10">
-                        <button type="submit" class="btn btn-primary k-button w100 loginbtn" id="submit">Log In</button>
-                    </div>
-                    <div class="text-center">
-                        <span class="text-dark font-medium">Forgot Password?</span>
-                        <a asp-action="Forgot" class="forgot-pwd btn-link-trans font-medium text-dark text-primary"
-                            aria-label="Forgot password">click here</a>
-                    </div>
-                    <p id="message" class="text-center text-danger"></p>
-                    <div class="text-center">
-                        <span class="text-dark font-medium">Don't Have an account?</span>
-                        <a asp-action="Register"
-                            class="forgot-pwd btn-link-trans font-medium text-dark text-primary">Register here</a>
+                        <div class="form-group animate-slide-in">
+                            <input type="email" class="k-textbox login-textbox" placeholder="Email" id="loginEmail"
+                                name="loginEmail">
+                            <span class="login-textbox-icon"><i class="icon-email"></i></span>
+                        </div>
+                        <div class="form-group animate-slide-in">
+                            <input type="password" class="k-textbox login-textbox" placeholder="Password" id="loginPassword"
+                                name="loginPassword">
+                            <span class="login-textbox-icon"><i class="icon-locked"></i></span>
+                        </div>
+                        <div class="form-group pb-10 animate-slide-in">
+                            <button type="submit" class="btn btn-primary k-button w100 loginbtn">Log In</button>
+                        </div>
+                        <div class="text-center animate-fade-in">
+                            <span class="text-dark font-medium">Forgot Password?</span>
+                            <a asp-action="Forgot" class="forgot-pwd btn-link-trans font-medium text-dark text-primary"
+                                aria-label="Forgot password">Click here</a>
+                        </div>
+                        <p id="message" class="text-center text-danger"></p>
+                        <div class="text-center animate-fade-in">
+                            <span class="text-dark font-medium">Don't have an account?</span>
+                            <a asp-action="Register"
+                                class="forgot-pwd btn-link-trans font-medium text-dark text-primary">Register here</a>
+                        </div>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
+<style>
+    .animate-fade-in {
+        animation: fadeIn 1s ease-in-out;
+    }
 
-<!-- Load Necessary Scripts -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script> <!-- SignalR -->
+    .animate-slide-in {
+        animation: slideIn 1s ease-in-out;
+    }
 
+    .scrollable-form {
+        max-height: 500px;
+        overflow-y: auto;
+        padding: 10px;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    @@keyframes slideIn {
+        from {
+            transform: translateY(-20px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .error {
+        color: red !important;
+        font-size: 14px;
+        display: block;
+        margin-top: 5px;
+    }
+</style>
 <script>
     $(document).ready(function () {
-        console.log($.fn.validate ? " jQuery Validation is loaded" : " jQuery Validation is missing!");
-
-        // jQuery Validation
         $("#loginForm").validate({
             rules: {
                 loginEmail: { required: true, email: true },
@@ -76,100 +117,42 @@
                 loginPassword: { required: "Password is required" }
             },
             submitHandler: function (form) {
-                loginUser(); // Call login function when form is valid
+                loginUser();
             }
         });
 
         function loginUser() {
-            var email = $("#loginEmail").val();
-            var password = $("#loginPassword").val();
-            var role = $("#role").val();
-            var formData = new FormData();
-            formData.append("c_email", email);
-            formData.append("c_password", password);
-            formData.append("c_role", role);
+            var formData = {
+                role: $('#role').val(),
+                email: $('#loginEmail').val(),
+                password: $('#loginPassword').val()
+            };
 
             $.ajax({
-                url: "http://localhost:5136/api/UserApi/Login", // API Endpoint
-                type: "POST",
-                processData: false,
-                contentType: false,
-                data: formData,
+                url: 'http://localhost:5136/api/UserApi/Login',
+                type: 'POST',
+                data: JSON.stringify(formData),
+                contentType: 'application/json',
                 success: function (response) {
-                    var userdata = JSON.stringify(response.data);
-                    if (response.success) {
-                        sessionStorage.setItem("userEmail", email); // Store email for SignalR chat
-                        sessionStorage.setItem("User", userdata);
-
-                        // SweetAlert2 Success Message
-                        Swal.fire({
-                            title: "Login Successful!",
-                            text: response.message,
-                            icon: "success",
-                            confirmButtonText: "Continue"
-                        }).then(() => {
-                            // Redirect based on role after user clicks "Continue"
-                            if (response.role == "Admin") {
-                                window.location.href = "/Admin/Index";
-                            } else {
-                                window.location.href = "/User/Task";
-                            }
-                        });
-
-                        // Connect to SignalR after successful login
-                        connectToSignalR(email);
-                    } else {
-                        // Show error message using SweetAlert2
-                        Swal.fire({
-                            title: "Login Failed!",
-                            text: response.message,
-                            icon: "error",
-                            confirmButtonText: "Try Again"
-                        });
-                    }
+                    Swal.fire({
+                        title: "Success!",
+                        text: "Login successful!",
+                        icon: "success",
+                        confirmButtonText: "OK",
+                        timer: 2000
+                    }).then(() => {
+                        window.location = '../Dashboard';
+                    });
                 },
                 error: function (xhr) {
-                    console.log(xhr.responseText);
                     Swal.fire({
-                        title: "User Not Authorized!",
-                        text: "Wait until Admin approves your account.",
-                        icon: "warning",
-                        confirmButtonText: "Okay"
+                        title: "Error!",
+                        text: "Invalid credentials. Please try again.",
+                        icon: "error",
+                        confirmButtonText: "OK"
                     });
                 }
             });
-        }
-
-        function connectToSignalR(userEmail) {
-            let connection = new signalR.HubConnectionBuilder()
-                .withUrl("http://localhost:5136/chatHub") // ChatHub URL
-                .configureLogging(signalR.LogLevel.Information)
-                .build();
-
-            // Handle real-time messages
-            connection.on("ReceiveMessage", function (sender, message) {
-                console.log("New message from " + sender + ": " + message);
-
-                // Show real-time message in SweetAlert2 instead of alert
-                Swal.fire({
-                    title: "New Message",
-                    text: `From ${sender}: ${message}`,
-                    icon: "info",
-                    toast: true,
-                    position: "top-end",
-                    showConfirmButton: false,
-                    timer: 3000
-                });
-            });
-
-            // Start the connection
-            connection.start()
-                .then(function () {
-                    console.log("Connected to SignalR as " + userEmail);
-                })
-                .catch(function (err) {
-                    console.error("SignalR connection error: ", err);
-                });
         }
     });
 </script>
