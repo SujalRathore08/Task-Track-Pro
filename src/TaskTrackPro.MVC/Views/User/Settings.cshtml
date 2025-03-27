@@ -54,61 +54,6 @@
     </div>
 </div>
 
-<div class="container mt-4">
-    <h2>Change Password</h2>
-    <div class="alert alert-success d-none" id="successMessage">Password updated successfully!</div>
-    <div class="alert alert-danger d-none" id="errorMessage"></div>
-
-    <form id="changePasswordForm">
-        <div class="mb-3">
-            <label for="oldPassword" class="form-label">Old Password</label>
-            <input type="password" class="form-control" id="oldPassword" name="OldPassword" required>
-        </div>
-        <div class="mb-3">
-            <label for="newPassword" class="form-label">New Password</label>
-            <input type="password" class="form-control" id="newPassword" name="NewPassword" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Update Password</button>
-    </form>
-</div>
-
-
-<script>
-    $(document).ready(function () {
-        var userData = JSON.parse(sessionStorage.getItem("User"));
-
-        $("#changePasswordForm").submit(function (e) {
-            e.preventDefault();
-
-            var userId = parseInt(userData.c_uid); // Fetch user ID from session
-            var oldPassword = $("#oldPassword").val();
-            var newPassword = $("#newPassword").val();
-
-            var formData = new FormData();
-            formData.append("c_uid", userId);
-            formData.append("OldPassword", oldPassword);
-            formData.append("NewPassword", newPassword);
-
-            $.ajax({
-                url: "http://localhost:5136/api/UserApi/ChangePassword", // Update this with your API endpoint
-                type: "PUT",
-                processData: false,
-                contentType: false,
-                data: formData,
-                success: function (response) {
-                    $("#successMessage").removeClass("d-none").text("Password updated successfully!");
-                    $("#errorMessage").addClass("d-none");
-                    $("#changePasswordForm")[0].reset();
-                },
-                error: function (xhr) {
-                    $("#errorMessage").removeClass("d-none").text(xhr.responseText);
-                    $("#successMessage").addClass("d-none");
-                }
-            });
-        });
-    });
-</script>
-
 <script>
     $(document).ready(function () {
         $("#logout").on("click", function () {
@@ -177,6 +122,7 @@
                 contentType: false,
                 data: formData,
                 success: function (response) {
+                    console.log(response);
                     $("#successMessage").removeClass("d-none").text("Profile updated successfully!");
                     $("#errorMessage").addClass("d-none");
                 },
