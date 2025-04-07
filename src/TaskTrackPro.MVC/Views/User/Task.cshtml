@@ -65,12 +65,14 @@
             </div>
             <div class="form-group">
                 <label>Description <span class="text-muted">(Optional)</span></label>
-                <textarea disabled id="UpdatetaskDescription" class="form-control" rows="4" placeholder="Write here" title="description"></textarea>
+                <textarea disabled id="UpdatetaskDescription" class="form-control" rows="4" placeholder="Write here"
+                    title="description"></textarea>
             </div>
         </form>
     </div>
     <div class="window-footer">
-        <a class="btn btn-trans close-window">Cancel</a><a id="updateTaskBtn" class="btn btn-primary" type="button">Save</a>
+        <a class="btn btn-trans close-window">Cancel</a><a id="updateTaskBtn" class="btn btn-primary"
+            type="button">Save</a>
     </div>
 </div>
 
@@ -207,6 +209,12 @@
             data: JSON.stringify(updatedTask),
             success: function (response) {
                 console.log(response);
+                $(".k-window-titlebar").css("display", "none");
+                $(".k-header").css("display", "none");
+                $(".delete-page").css("display", "none");
+                $(".k-widget").css("display", "none");
+                $(".k-window").css("display", "none");
+                $(".k-overlay").css("display", "none");
                 Swal.fire({
                     icon: 'success',
                     title: 'Task Updated!',
@@ -214,8 +222,9 @@
                     showConfirmButton: false, // Hide OK button
                     timer: 1500 // Close after 1.5 seconds
                 }).then(() => {
-                    $("#taskGrid").data("kendoGrid").dataSource.read();
-                    $("#edit-window-table").data("kendoWindow").close();
+                    window.location.href="../User/Task";
+                    @* $("#taskGrid").data("kendoGrid").dataSource.read();
+                    $("#edit-window-table").data("kendoWindow").close(); *@
                 });
             },
             error: function (xhr) {

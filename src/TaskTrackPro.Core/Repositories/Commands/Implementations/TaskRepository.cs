@@ -170,21 +170,21 @@ namespace TaskTrackPro.Core.Repositories.Commands.Implementations
 
         public async Task<int> Update(t_task taskData)
         {
+            Console.WriteLine($"Updating Task: c_tid={taskData.c_tid}, c_uid={taskData.c_uid}");
             try
             {
                 await using var conn = new NpgsqlConnection(_connectionString);
                 await conn.OpenAsync();
 
                 string query = @"
-            UPDATE t_task 
-            SET 
-                c_uid = @c_uid, 
-                c_task_title = @c_task_title, 
-                c_description = @c_description, 
-                c_start_date = @c_start_date, 
-                c_end_date = @c_end_date, 
-                c_task_status = @c_task_status
-            WHERE c_tid = @c_tid";
+                UPDATE t_task 
+                SET
+                    c_task_title = @c_task_title, 
+                    c_description = @c_description, 
+                    c_start_date = @c_start_date, 
+                    c_end_date = @c_end_date, 
+                    c_task_status = @c_task_status
+                WHERE c_tid = @c_tid";
 
                 await using var cm = new NpgsqlCommand(query, conn);
 

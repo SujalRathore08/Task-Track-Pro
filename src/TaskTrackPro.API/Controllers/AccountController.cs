@@ -66,10 +66,55 @@ namespace TaskTrackPro.API.Controllers
                 message.To.Add(new MailboxAddress("", email));
                 message.Subject = "Your OTP Code";
 
-                message.Body = new TextPart("plain")
-                {
-                    Text = $"Your OTP code is: {otp}. It is valid for 5 minutes."
-                };
+                string htmlBody = $@"
+            <html>
+            <head>
+                <style>
+                    body {{
+                        font-family: Arial, sans-serif;
+                        background-color: #f4f4f4;
+                        text-align: center;
+                        padding: 20px;
+                    }}
+                    .container {{
+                        max-width: 400px;
+                        margin: auto;
+                        background: #ffffff;
+                        padding: 20px;
+                        border-radius: 8px;
+                        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+                    }}
+                    .otp {{
+                        font-size: 20px;
+                        font-weight: bold;
+                        color: #0056b3;
+                        background: #f8f9fa;
+                        padding: 10px;
+                        display: inline-block;
+                        margin-top: 10px;
+                        border-radius: 5px;
+                    }}
+                    .footer {{
+                        margin-top: 20px;
+                        font-size: 12px;
+                        color: #888;
+                    }}
+                </style>
+            </head>
+            <body>
+                <div class='container'>
+                    <h2>Your OTP Code</h2>
+                    <p>Please use the following OTP to complete your verification. This OTP is valid for 5 minutes.</p>
+                    <div class='otp'>{otp}</div>
+                    <p>If you did not request this, please ignore this email.</p>
+                    <div class='footer'>
+                        <p>TaskTrackPro Team</p>
+                    </div>
+                </div>
+            </body>
+            </html>";
+
+                message.Body = new TextPart("html") { Text = htmlBody };
 
                 using (var client = new SmtpClient())
                 {
@@ -87,6 +132,7 @@ namespace TaskTrackPro.API.Controllers
                 return false;
             }
         }
+
 
         [HttpPost("VerifyOtp")]
         public async Task<IActionResult> VerifyOtp([FromForm] OtpVerificationRequest request)

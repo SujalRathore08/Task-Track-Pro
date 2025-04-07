@@ -9,7 +9,7 @@
         <li><a asp-action="Task" id="iAuditInspection" class="ms-menu-link">Task</a></li>
         <li><a asp-action="Messages" id="iAuditAnalytics" class="ms-menu-link">Messages</a></li>
         <li><a id="logout" class="ms-menu-link">Logout</a></li>
-
+    </ul>
 </section>
 
 <!--// Menu Section-->
@@ -76,7 +76,6 @@
     <div class="window-wrapper">
         <input hidden id="UserId" type="text">
         <div class="mb-10">
-
             <img id="UserProfile" style="width: 100%; height: 300px;" alt="UserProfileImage">
         </div>
         <div class="mb-10">
@@ -104,6 +103,7 @@
 @* Show Approv user script *@
 <script>
     $("#task-window-table").kendoWindow({
+
         width: 450,
         title: "Approve User",
         visible: false,
@@ -122,6 +122,7 @@
 
 <script>
     $("#Dataimportgrid").kendoGrid({
+        dataSource: fieldData,
         totalRecordPerPage: 5,
         scrollable: true,
         resizable: false,
@@ -146,11 +147,12 @@
     }).data("kendoGrid");
 
     $("#Dataimportgrid-pager").kendoPager({
+        dataSource: fieldData,
         refresh: true
     });
-    @* fieldData.read(); *@
+    fieldData.read();
 
-        $("#Dataimportgrid-pager").append("<div class='more-oprion'><span class='separator'></span><a href='javascript:void(0)' id='moreOption' class='text-muted btn-default-hover'><i class='icon-option'></i></a></div>");
+    $("#Dataimportgrid-pager").append("<div class='more-oprion'><span class='separator'></span><a href='javascript:void(0)' id='moreOption' class='text-muted btn-default-hover'><i class='icon-option'></i></a></div>");
 
     var popup = $("#popup").kendoPopup({
         animation: false,
@@ -202,7 +204,7 @@
                     resizable: false,
                     autoBind: true,
                     columns: [
-                        { selectable: true, width: "50px" },
+                        @* { selectable: true, width: "50px" }, *@
                         { field: "datano", title: "No", width: "90px" },
                         { field: "dataid", title: "ID", width: "135px" },
                         { field: "datareq", title: "Name", width: "200px" },
@@ -212,7 +214,7 @@
                             field: "dataVal",
                             title: "Profile Picture",
                             width: "150px",
-                            template: "<img src='/profile_images/#: dataVal #' width='50' height='50' alt='Profile' />"
+                            template: "<img src='/profile_images/#: dataVal #' width='50' height='50' alt='Profile' style='height: 3rem;border-radius: 2rem;'/>"
                         },
                         {
                             field: "dataInt",
@@ -319,8 +321,9 @@
             type: "GET",
             dataType: "json",
             success: function (data) {
+                console.log(data);
                 var formattedData = data.map((user, index) => ({
-                    datano: index,
+                    datano: index + 1,
                     dataid: user.c_uid,
                     datareq: user.Name,
                     dataTpl: user.Email,
@@ -384,7 +387,5 @@
                 alert("Failed to fetch data.");
             }
         });
-
-
     })
 </script>

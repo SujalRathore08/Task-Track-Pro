@@ -123,7 +123,7 @@ namespace TaskTrackPro.Core.Services.Email
                     <div class='content'>
                         <p><strong>UserName:</strong> {userName}</p>
                         <p><strong>Email:</strong> {userEmail}</p>
-                        <p>A new user has registered on <b>TaskTrackPro</b>. Click the button below to view details.</p>
+                        <p style='color:white;'>A new user has registered on <b>TaskTrackPro</b>. Click the button below to view details.</p>
                         <a href='https://yourwebsite.com/admin-dashboard' class='button'>View User</a>
                     </div>
                     <div class='footer'>© 2025 TaskTrackPro. All Rights Reserved.</div>
